@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#F7F3EF">
+<title>Saku Bidan</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23B8935A' d='M3 18h18v2H3zM3 7l4.5 4L12 4l4.5 7L21 7l-1.5 9h-15z'/></svg>">
+<style>
+:root{--bg:#F7F3EF;--card:#fff;--ink:#2E2426;--muted:#76676A;--line:#E8DED8;--accent:#A0606A;--gold:#B8935A;--calc:#F7F1EE}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-text-size-adjust:100%}
+main{max-width:480px;margin:0 auto;padding:20px 16px 32px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.hello{margin:0;color:var(--muted);font-size:14px}
+h1{margin:0;font-size:26px;letter-spacing:-.02em;display:flex;align-items:center;gap:8px}
+h1 svg{width:20px;height:20px;color:var(--gold)}
+.tabs{position:sticky;top:0;z-index:1;display:flex;gap:24px;margin:12px -16px 16px;padding:0 16px;background:var(--bg);border-bottom:1px solid var(--line)}
+.tabs button{padding:12px 0;margin-bottom:-1px;border:0;border-bottom:2px solid transparent;background:none;font:inherit;font-weight:600;color:var(--muted);cursor:pointer}
+.tabs button[aria-selected=true]{color:var(--ink);border-color:var(--accent)}
+section{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 14px 16px;margin-bottom:12px}
+h2{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:0;font-size:16px}
+h2 small,.note{font-size:12px;font-weight:400;color:var(--muted)}
+h3{margin:14px 0 0;font-size:13px;font-weight:600;color:var(--muted)}
+label{display:block;margin:10px 0 4px;font-size:13px;color:var(--muted)}
+input,select,textarea{width:100%;min-height:42px;padding:8px 10px;font:inherit;font-size:16px;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:8px}
+textarea{min-height:88px;resize:vertical}
+fieldset{min-width:0;margin:0;padding:0;border:0}
+fieldset:disabled{opacity:.55}
+:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.row{display:flex;gap:10px}.row>div{flex:1;min-width:0}
+.res{margin-top:12px}
+.kv{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:8px 0;border-top:1px solid var(--line)}
+.kv span{font-size:14px;color:var(--muted)}
+.kv b{text-align:right;white-space:nowrap;font-weight:600;font-variant-numeric:tabular-nums}
+.kv .hi{font-size:17px;color:var(--accent)}
+.calc{margin:8px 0 0;padding:10px;background:var(--calc);border-radius:6px;font:12.5px/1.5 ui-monospace,Consolas,monospace;white-space:pre-wrap}
+.note{margin:8px 0 0}
+#fbStatus:empty{display:none}
+.btn{margin-top:12px;padding:8px 12px;font:inherit;font-size:14px;font-weight:600;color:var(--accent);background:none;border:1px solid var(--accent);border-radius:8px;cursor:pointer}
+.btn:disabled{color:var(--muted);border-color:var(--line);cursor:default}
+.link{padding:0;border:0;background:none;font:inherit;font-weight:600;color:var(--accent);cursor:pointer}
+.h{padding:10px 0;border-top:1px solid var(--line);font-variant-numeric:tabular-nums}
+.h:first-child{border-top:0;padding-top:0}
+.h div{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:var(--muted)}
+.h b{color:var(--accent)}
+.h strong{display:block;margin-top:2px;font-weight:600}
+.h .note{margin-top:2px}
+.bab{display:flex;align-items:center;gap:10px;padding:6px 0}
+.bab span{flex:1;font-size:14px}
+.bab select{width:7.5em;min-height:36px;padding:4px 8px}
+.bab select[data-s="2"]{border-color:var(--accent);color:var(--accent)}
+.bab select[data-s="3"]{background:var(--accent);border-color:var(--accent);color:#fff}
+#countdown{margin:8px 0 0;font-weight:600;color:var(--accent)}
+#countdown:empty{display:none}
+footer{margin-top:20px;font-size:12px;color:var(--muted);text-align:center}
+</style>
+</head>
+<body>
+<main>
+  <div class="top">
+    <p class="hello" id="hello"></p>
+    <button class="link if-out" data-login hidden>Masuk</button>
+    <button class="link if-in" id="logout" hidden>Keluar</button>
+  </div>
+  <h1>Saku Bidan <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 18h18v2H3zM3 7l4.5 4L12 4l4.5 7L21 7l-1.5 9h-15z"/></svg></h1>
+  <p class="note" id="fbStatus"></p>
+
+  <nav class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-tab="klinik">Klinik</button>
+    <button role="tab" aria-selected="false" data-tab="riset">Penelitian</button>
+    <button role="tab" aria-selected="false" data-tab="riwayat">Riwayat</button>
+  </nav>
+
+  <div id="klinik">
+    <section>
+      <h2>Kehamilan <small>Naegele · PMK 6/2024</small></h2>
+      <div class="row">
+        <div><label for="hpht">HPHT</label><input type="date" id="hpht"></div>
+        <div><label for="acuan">Dihitung per</label><input type="date" id="acuan"></div>
+      </div>
+      <div class="res" id="outHamil"></div>
+    </section>
+
+    <section>
+      <h2>Taksiran berat janin <small>Johnson-Toshack</small></h2>
+      <div class="row">
+        <div><label for="tfu">TFU (cm)</label><input id="tfu" inputmode="decimal" placeholder="mis. 32"></div>
+        <div><label for="kepala">Kepala masuk PAP?</label>
+          <select id="kepala">
+            <option value="12">Belum, n=12</option>
+            <option value="11">Sudah, n=11</option>
+          </select>
+        </div>
+      </div>
+      <div class="res" id="outTbj"></div>
+    </section>
+
+    <section>
+      <h2>Nifas &amp; neonatus <small>PMK 21/2021 ps. 22</small></h2>
+      <label for="lahir">Tanggal persalinan</label><input type="date" id="lahir">
+      <div class="res" id="outNifas"></div>
+    </section>
+  </div>
+
+  <div id="riset" hidden>
+    <section>
+      <h2>Jumlah sampel <small>Slovin · Lemeshow</small></h2>
+      <label for="metode">Rumus</label>
+      <select id="metode">
+        <option value="slovin">Slovin (N diketahui)</option>
+        <option value="lemeshow">Lemeshow (proporsi)</option>
+      </select>
+      <div id="fSlovin" class="row">
+        <div><label for="sN">Populasi (N)</label><input id="sN" type="number" inputmode="numeric" min="1" placeholder="mis. 120"></div>
+        <div><label for="sE">Margin error (e)</label>
+          <select id="sE"><option value="0.05">5%</option><option value="0.1" selected>10%</option><option value="0.01">1%</option></select>
+        </div>
+      </div>
+      <div id="fLeme" hidden>
+        <div class="row">
+          <div><label for="lZ">Kepercayaan</label>
+            <select id="lZ"><option value="1.96">95% (Z 1,96)</option><option value="1.645">90% (Z 1,645)</option><option value="2.576">99% (Z 2,576)</option></select>
+          </div>
+          <div><label for="lP">Proporsi (p)</label><input id="lP" inputmode="decimal" value="0,5"></div>
+        </div>
+        <div class="row">
+          <div><label for="lD">Presisi (d)</label><input id="lD" inputmode="decimal" value="0,1"></div>
+          <div><label for="lN">Populasi (N)</label><input id="lN" type="number" inputmode="numeric" min="1" placeholder="boleh kosong"></div>
+        </div>
+      </div>
+      <label for="drop">Cadangan drop-out (%)</label>
+      <input id="drop" type="number" inputmode="numeric" min="0" max="50" placeholder="boleh kosong, mis. 10">
+      <div class="res" id="outSampel"></div>
+    </section>
+
+    <section>
+      <h2>Progress skripsi <small>tersimpan di akun</small></h2>
+      <p class="note if-out" hidden>Masuk dengan Google supaya progress tersimpan. <button class="link" data-login>Masuk</button></p>
+      <fieldset id="skripsi" disabled>
+        <div id="babs" style="margin-top:8px"></div>
+        <p class="note" id="accText"></p>
+        <label for="sidang">Tanggal sidang</label><input type="date" id="sidang">
+        <p id="countdown"></p>
+        <label for="catatan">Catatan revisi pembimbing</label>
+        <textarea id="catatan" placeholder="mis. BAB II tambah teori anemia, cek sitasi"></textarea>
+      </fieldset>
+    </section>
+  </div>
+
+  <div id="riwayat" hidden>
+    <section>
+      <h2>Riwayat hitungan <small>50 terakhir</small></h2>
+      <p class="note if-out" hidden>Masuk dengan Google supaya riwayat tersimpan dan bisa dibuka dari HP mana saja. <button class="link" data-login>Masuk</button></p>
+      <div id="hist" style="margin-top:10px"></div>
+      <button class="btn" id="clearHist" hidden>Hapus semua riwayat</button>
+      <p class="note if-in" id="akun" hidden></p>
+    </section>
+  </div>
+
+  <footer>Alat bantu hitung. Tetap ikuti protokol dan arahan pembimbing.</footer>
+</main>
+
+<script>
+// Ganti dengan config dari Firebase Console > Project settings > Your apps > Web app.
+// Config ini memang terlihat publik; yang menjaga data adalah firestore.rules.
+const FIREBASE_CONFIG = {
+  apiKey: 'AIzaSyCk401IqoWD7WpUS6ZwHSp-3XsOPRrxbK4',
+  authDomain: 'saku-bidan-19937.firebaseapp.com',
+  projectId: 'saku-bidan-19937',
+  appId: '1:371671019753:web:84ccbbd51ca87542650078',
+};
+const FB = 'https://www.gstatic.com/firebasejs/12.19.0/';
+
+const $ = id => document.getElementById(id);
+// onchange juga dipasang: date picker di sebagian iOS lama hanya mengirim change
+const on = (ids, f) => ids.forEach(id => { $(id).oninput = $(id).onchange = f; });
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+
+// ---- tanggal ----
+const parse = v => { if (!v) return null; const [y, m, d] = v.split('-').map(Number); return new Date(y, m - 1, d); };
+const iso = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+const addDays = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+const diffDays = (a, b) => Math.round((Date.UTC(b.getFullYear(), b.getMonth(), b.getDate()) - Date.UTC(a.getFullYear(), a.getMonth(), a.getDate())) / 864e5);
+const fmt = d => d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+const fmtS = d => d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+const dm = d => d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+// tahun cukup ditulis sekali kalau sama, biar tidak patah baris di HP
+const span = (a, b) => (a.getFullYear() === b.getFullYear() ? dm(a) : fmtS(a)) + ' – ' + fmtS(b);
+const range = (d, a, b) => span(addDays(d, a), addDays(d, b));
+const num = x => x.toLocaleString('id-ID', { maximumFractionDigits: 4 });
+const dec = v => Number(String(v).trim().replace(',', '.'));
+const kv = (k, v, hi) => `<div class="kv"><span>${k}</span><b${hi ? ' class="hi"' : ''}>${v}</b></div>`;
+
+// ---- rumus ----
+const hpl = h => new Date(h.getFullYear() + 1, h.getMonth() - 3, h.getDate() + 7); // Naegele: hari +7, bulan -3, tahun +1
+const usia = (h, t) => { const d = diffDays(h, t); return { mg: Math.floor(d / 7), hr: d % 7, total: d }; };
+// batas trimester Pedoman ANC Terpadu 2020: ≤12 mgg, >12–24 mgg, >24 mgg
+const trimester = hari => hari <= 84 ? 'I (≤12 mgg)' : hari <= 168 ? 'II (>12–24 mgg)' : 'III (>24 mgg)';
+const tbj = (tfu, n) => (tfu - n) * 155;
+const up = x => Math.ceil(x - 1e-9); // hindari 50,0000001 -> 51 karena floating point
+const slovin = (N, e) => up(N / (1 + N * e * e));
+const lemeshowRaw = (z, p, d, N) => N ? (z * z * p * (1 - p) * N) / (d * d * (N - 1) + z * z * p * (1 - p)) : (z * z * p * (1 - p)) / (d * d);
+const lemeshow = (z, p, d, N) => up(lemeshowRaw(z, p, d, N));
+const dropout = (n, f) => up(n / (1 - f));
+
+// ---- Firebase (diisi setelah SDK termuat, lihat bagian paling bawah) ----
+let A, F, auth, db, unsub = () => {};
+const userRef = () => F.doc(db, 'users', auth.currentUser.uid);
+const login = () => A.signInWithPopup(auth, new A.GoogleAuthProvider());
+const loginFail = e => ['auth/popup-closed-by-user', 'auth/cancelled-popup-request'].includes(e.code)
+  || alert(`Gagal masuk (${e.code || e.message}). Coba buka lewat Chrome atau Safari, bukan browser di dalam aplikasi lain.`);
+const saveFail = e => alert(`Gagal menyimpan (${e.code || e.message}).`);
+
+// ---- riwayat: koleksi users/{uid}/riwayat, tampil 50 terakhir ----
+const pending = {};
+const saveBtn = (k, a, b) => { pending[k] = { a, b }; return `<button class="btn" data-save="${k}">Simpan ke riwayat</button>`; };
+let hist = [];
+function renderHist() {
+  $('hist').innerHTML = !auth?.currentUser ? '' : hist.map(x => `<div class="h"><div><b>${esc(x.k)}</b><span>${new Date(x.t).toLocaleString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span></div><strong>${esc(x.a)}</strong><p class="note">${esc(x.b)}</p></div>`).join('')
+    || '<p class="note">Belum ada. Tekan "Simpan ke riwayat" di bawah hasil hitungan.</p>';
+  $('clearHist').hidden = !hist.length;
+}
+document.addEventListener('click', async e => {
+  if (e.target.closest('[data-login]')) return login().catch(loginFail);
+  const b = e.target.closest('[data-save]');
+  if (!b) return;
+  if (!auth) return alert('Belum terhubung ke server. Cek internet lalu muat ulang halaman.');
+  const entry = { t: Date.now(), k: b.dataset.save, ...pending[b.dataset.save] };
+  if (!auth.currentUser) {
+    try { await login(); } catch (er) { return loginFail(er); }
+  }
+  // tanpa await: saat offline tetap langsung tercatat di HP, dikirim ke server saat online
+  F.addDoc(F.collection(userRef(), 'riwayat'), entry).catch(saveFail);
+  b.disabled = true; b.textContent = 'Tersimpan';
+});
+$('clearHist').onclick = () => confirm('Hapus semua riwayat?')
+  && F.getDocs(F.collection(userRef(), 'riwayat')).then(s => s.forEach(d => F.deleteDoc(d.ref))).catch(saveFail);
+$('logout').onclick = () => A.signOut(auth);
+
+// ---- sapaan ----
+const h = new Date().getHours();
+$('hello').textContent = 'Selamat ' + (h < 4 ? 'malam' : h < 11 ? 'pagi' : h < 15 ? 'siang' : h < 18 ? 'sore' : 'malam') + ', Princess';
+
+// ---- tab ----
+document.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => {
+  document.querySelectorAll('[data-tab]').forEach(x => { x.setAttribute('aria-selected', x === b); $(x.dataset.tab).hidden = x !== b; });
+});
+
+// ---- kehamilan ----
+$('acuan').value = iso(new Date());
+on(['hpht', 'acuan'], () => {
+  const hp = parse($('hpht').value), t = parse($('acuan').value) || new Date(), o = $('outHamil');
+  if (!hp) return o.innerHTML = '';
+  const u = usia(hp, t), tp = hpl(hp), sisa = diffDays(t, tp);
+  if (u.total < 0) return o.innerHTML = '<p class="note">HPHT jatuh setelah tanggal hitung. Cek lagi.</p>';
+  o.innerHTML = kv('HPL', fmt(tp), 1) + kv('Usia kehamilan', `${u.mg} minggu ${u.hr} hari`, 1)
+    + kv('Trimester', trimester(u.total)) + kv(sisa >= 0 ? 'Menuju HPL' : 'Lewat HPL', Math.abs(sisa) + ' hari')
+    + (u.mg >= 42 ? '<p class="note">Sudah lebih dari 42 minggu. Pastikan HPHT benar.</p>' : '')
+    + '<h3>Jadwal ANC minimal 6x</h3>'
+    + kv('TM I · 1x, dokter', range(hp, 0, 84))
+    + kv('TM II · 2x', range(hp, 85, 168))
+    + kv('TM III · 3x, 1 dokter', span(addDays(hp, 169), tp))
+    + saveBtn('Kehamilan', `HPL ${fmtS(tp)} · UK ${u.mg} mgg ${u.hr} hr`, `HPHT ${fmtS(hp)} · dihitung per ${fmtS(t)}`);
+});
+
+// ---- TBJ ----
+on(['tfu', 'kepala'], () => {
+  const v = $('tfu').value, tfu = dec(v), n = +$('kepala').value, o = $('outTbj');
+  if (!v) return o.innerHTML = '';
+  if (!(tfu > n)) return o.innerHTML = `<p class="note">TFU harus lebih dari ${n} cm.</p>`;
+  const g = tbj(tfu, n);
+  o.innerHTML = kv('TBJ', num(g) + ' gram', 1)
+    + `<pre class="calc">TBJ = (TFU − n) × 155\n    = (${num(tfu)} − ${n}) × 155\n    = ${num(g)} gram</pre>`
+    + '<p class="note">Ada buku yang memakai tiga tingkat (n = 13, 12, 11). Ikuti pedoman kampus.</p>'
+    + saveBtn('TBJ', num(g) + ' gram', `TFU ${num(tfu)} cm · kepala ${n === 12 ? 'belum' : 'sudah'} masuk PAP (n=${n})`);
+});
+
+// ---- nifas & neonatus ----
+const JADWAL = [['KF1 & KN1', '6 jam–2 hari', 0, 2], ['KF2 & KN2', 'hari 3–7', 3, 7], ['KF3 & KN3', 'hari 8–28', 8, 28], ['KF4', 'hari 29–42', 29, 42]];
+on(['lahir'], () => {
+  const p = parse($('lahir').value), o = $('outNifas');
+  if (!p) return o.innerHTML = '';
+  o.innerHTML = JADWAL.map(([k, w, a, b]) => kv(`${k} · ${w}`, range(p, a, b))).join('')
+    + saveBtn('Nifas', 'Persalinan ' + fmtS(p), JADWAL.map(([k, , a, b]) => `${k} ${dm(addDays(p, a))}–${dm(addDays(p, b))}`).join(' · '));
+});
+
+// ---- sampel ----
+on(['metode', 'sN', 'sE', 'lZ', 'lP', 'lD', 'lN', 'drop'], () => {
+  const slv = $('metode').value === 'slovin', o = $('outSampel');
+  $('fSlovin').hidden = !slv; $('fLeme').hidden = slv;
+  let n, calc, info;
+  if (slv) {
+    const N = +$('sN').value, e = +$('sE').value;
+    if (!(N > 0)) return o.innerHTML = '';
+    n = slovin(N, e);
+    calc = `n = N / (1 + N·e²)\n  = ${N} / (1 + ${N} × ${num(e)}²)\n  = ${num(N / (1 + N * e * e))}\n  ≈ ${n}`;
+    info = `Slovin · N=${N} · e=${num(e * 100)}%`;
+  } else {
+    const z = +$('lZ').value, p = dec($('lP').value), d = dec($('lD').value), N = +$('lN').value || 0;
+    if (!(p > 0 && p < 1 && d > 0 && d < 1)) return o.innerHTML = '<p class="note">Isi p dan d antara 0 dan 1, mis. 0,5 dan 0,1.</p>';
+    n = lemeshow(z, p, d, N);
+    const zp = `${num(z)}² × ${num(p)} × ${num(1 - p)}`;
+    calc = (N ? `n = Z²·p·(1−p)·N / (d²·(N−1) + Z²·p·(1−p))\n  = ${zp} × ${N} / (${num(d)}² × ${N - 1} + ${zp})`
+              : `n = Z²·p·(1−p) / d²\n  = ${zp} / ${num(d)}²`) + `\n  = ${num(lemeshowRaw(z, p, d, N))}\n  ≈ ${n}`;
+    info = `Lemeshow · Z=${num(z)} · p=${num(p)} · d=${num(d)}` + (N ? ` · N=${N}` : '');
+  }
+  const f = (+$('drop').value || 0) / 100;
+  if (f > 0 && f < 1) {
+    const nd = dropout(n, f);
+    calc += `\n\nKoreksi drop-out ${num(f * 100)}%:\nn' = n / (1 − f)\n   = ${n} / (1 − ${num(f)})\n   ≈ ${nd}`;
+    info += ` · drop-out ${num(f * 100)}%`;
+    n = nd;
+  }
+  o.innerHTML = kv('Jumlah sampel', n + ' responden', 1) + `<pre class="calc">${calc}</pre><p class="note">Dibulatkan ke atas. Langkah hitung ini bisa disalin ke BAB III.</p>`
+    + saveBtn('Sampel', n + ' responden', info);
+});
+
+// ---- progress skripsi: field "skripsi" di dokumen users/{uid} ----
+const BAB = ['BAB I Pendahuluan', 'BAB II Tinjauan Pustaka', 'BAB III Metode', 'BAB IV Hasil &amp; Pembahasan', 'BAB V Penutup'];
+const STATUS = ['Belum', 'Ditulis', 'Revisi', 'ACC'];
+const ST0 = () => ({ bab: [0, 0, 0, 0, 0], sidang: '', catatan: '' });
+let st = ST0(), tm;
+// jeda 0,8 detik: catatan diketik per huruf, cukup sekali tulis ke server per jeda
+const saveSkripsi = () => { clearTimeout(tm); tm = setTimeout(() => auth?.currentUser && F.setDoc(userRef(), { skripsi: st }, { merge: true }).catch(saveFail), 800); };
+
+$('babs').innerHTML = BAB.map((b, i) => `<div class="bab"><span>${b}</span><select data-i="${i}" aria-label="Status ${b}">${STATUS.map((s, j) => `<option value="${j}">${s}</option>`).join('')}</select></div>`).join('');
+document.querySelectorAll('[data-i]').forEach(s => s.onchange = () => { st.bab[s.dataset.i] = +s.value; s.dataset.s = s.value; saveSkripsi(); progress(); });
+on(['sidang'], () => { st.sidang = $('sidang').value; saveSkripsi(); progress(); });
+on(['catatan'], () => { st.catatan = $('catatan').value; saveSkripsi(); });
+
+function fillSkripsi() {
+  document.querySelectorAll('[data-i]').forEach(s => { s.value = s.dataset.s = st.bab[s.dataset.i]; });
+  $('sidang').value = st.sidang; $('catatan').value = st.catatan;
+  progress();
+}
+function progress() {
+  const acc = st.bab.filter(x => x === 3).length;
+  $('accText').textContent = acc === 5 ? 'Semua BAB sudah ACC.' : acc + ' dari 5 BAB sudah ACC';
+  const s = parse(st.sidang);
+  if (!s) return $('countdown').textContent = '';
+  const d = diffDays(new Date(), s);
+  $('countdown').textContent = d > 0 ? 'H-' + d + ' menuju sidang' : d === 0 ? 'Hari ini sidang. Semangat, Princess.' : 'Sidang sudah lewat.';
+}
+fillSkripsi();
+
+// ---- muat Firebase di belakang: kalkulator tetap jalan walau sinyal lambat atau server gagal ----
+Promise.all(['app', 'auth', 'firestore'].map(m => import(FB + 'firebase-' + m + '.js'))).then(([fa, fauth, ffs]) => {
+  A = fauth; F = ffs;
+  const app = fa.initializeApp(FIREBASE_CONFIG);
+  auth = A.getAuth(app);
+  // cache di HP: tetap bisa menyimpan saat offline di puskesmas, dikirim saat online lagi
+  db = F.initializeFirestore(app, { localCache: F.persistentLocalCache({ tabManager: F.persistentMultipleTabManager() }) });
+  A.onAuthStateChanged(auth, async u => {
+    document.querySelectorAll('.if-in').forEach(x => x.hidden = !u);
+    document.querySelectorAll('.if-out').forEach(x => x.hidden = !!u);
+    $('skripsi').disabled = !u;
+    $('akun').textContent = u ? 'Tersimpan di akun ' + u.email : '';
+    unsub(); hist = []; st = ST0();
+    if (u) {
+      unsub = F.onSnapshot(F.query(F.collection(userRef(), 'riwayat'), F.orderBy('t', 'desc'), F.limit(50)),
+        s => { hist = s.docs.map(d => d.data()); renderHist(); },
+        e => { $('fbStatus').textContent = `Gagal membaca riwayat (${e.code}).`; });
+      const snap = await F.getDoc(userRef()).catch(() => null);
+      if (auth.currentUser !== u) return; // sudah keluar/ganti akun saat menunggu
+      st = Object.assign(ST0(), snap?.data()?.skripsi);
+    }
+    renderHist(); fillSkripsi();
+  });
+}).catch(() => { $('fbStatus').textContent = 'Tidak terhubung ke server. Kalkulator tetap bisa dipakai, tapi riwayat dan progress belum bisa disimpan.'; });
+
+// ---- self-check: buka dengan ?test lalu lihat console ----
+if (location.search.includes('test')) {
+  const eq = (a, b, m) => console.assert(a === b, m, a, b);
+  eq(iso(hpl(new Date(2026, 0, 15))), '2026-10-22', 'Naegele Jan');
+  eq(iso(hpl(new Date(2026, 5, 10))), '2027-03-17', 'Naegele Jun');
+  eq(usia(new Date(2026, 0, 1), new Date(2026, 0, 17)).mg + '/' + usia(new Date(2026, 0, 1), new Date(2026, 0, 17)).hr, '2/2', 'usia');
+  eq(trimester(84)[0] + trimester(85).slice(0, 2) + trimester(169).slice(0, 3), 'IIIIII', 'trimester');
+  eq(tbj(32, 12), 3100, 'TBJ');
+  eq(slovin(100, 0.1), 50, 'Slovin 100');
+  eq(slovin(400, 0.05), 200, 'Slovin 400');
+  eq(lemeshow(1.96, 0.5, 0.1), 97, 'Lemeshow tanpa N');
+  eq(lemeshow(1.96, 0.5, 0.1, 200), 66, 'Lemeshow N=200');
+  eq(dropout(97, 0.1), 108, 'drop-out');
+  eq(esc('<b>&"'), '&lt;b&gt;&amp;&quot;', 'escape');
+  console.log('self-check selesai');
+}
+</script>
+</body>
+</html>
