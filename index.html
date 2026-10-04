@@ -182,6 +182,14 @@ fieldset:disabled{opacity:.5}
 #akhir{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(92vw,400px);padding:var(--space-6) var(--space-4) var(--space-4);background:var(--bg);border:1px solid var(--line)}
 #akhir .btn{margin-top:var(--space-3)}
 
+/* ---- kotak konfirmasi & notifikasi kecil (pengganti confirm/alert bawaan browser) ---- */
+#tanya{width:min(86vw,340px);padding:var(--space-5) var(--space-4) var(--space-4);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 10px 30px rgba(0,0,0,.2)}
+#tanya::backdrop{background:rgba(29,23,25,.45)}
+#tanyaTeks{font:500 18px/25px var(--font-serif)}
+#tanya .aksi{display:flex;gap:var(--space-2);margin-top:var(--space-5)}
+#tanya .btn{flex:1;margin-top:0}
+#toast{position:fixed;z-index:20;left:50%;bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 12px);transform:translateX(-50%);width:max-content;max-width:min(92vw,440px);padding:12px 16px;color:var(--bg);background:var(--ink);border-radius:var(--radius);box-shadow:0 6px 20px rgba(0,0,0,.22);font:500 14px/20px var(--font-sans)}
+
 footer{padding:var(--space-5) var(--space-4);font:italic 400 14px/20px var(--font-serif);color:var(--ink-2)}
 
 @media (max-width:359px){
@@ -331,6 +339,17 @@ footer{padding:var(--space-5) var(--space-4);font:italic 400 14px/20px var(--fon
   </div>
 </div>
 
+<dialog id="tanya" aria-labelledby="tanyaTeks">
+  <form method="dialog">
+    <p id="tanyaTeks"></p>
+    <div class="aksi">
+      <button class="btn quiet" value="" id="tanyaBatal">Batal</button>
+      <button class="btn" value="ya" id="tanyaYa">Ya</button>
+    </div>
+  </form>
+</dialog>
+<div id="toast" role="status" aria-live="polite" hidden></div>
+
 <script>
 // Ganti dengan config dari Firebase Console > Project settings > Your apps > Web app.
 // Config ini memang terlihat publik; yang menjaga data adalah firestore.rules.
@@ -349,6 +368,18 @@ const on = (ids, f) => ids.forEach(id => { $(id).oninput = $(id).onchange = f; }
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 // nilai pilihan tunggal (radio) di dalam #kepala / #metode
 const picked = name => document.querySelector(`input[name="${name}"]:checked`).value;
+// kotak konfirmasi di dalam aplikasi: true kalau tombol utama ditekan (Batal/Esc = false).
+// jawaban diambil dari klik tombol, bukan event "close": Chrome menunda event itu ke frame berikutnya
+const tanya = (teks, ya = 'Ya') => new Promise(ok => {
+  const d = $('tanya'); $('tanyaTeks').textContent = teks; $('tanyaYa').textContent = ya;
+  const jawab = v => () => { $('tanyaYa').onclick = $('tanyaBatal').onclick = d.oncancel = null; ok(v); };
+  $('tanyaYa').onclick = jawab(true);
+  $('tanyaBatal').onclick = d.oncancel = jawab(false);
+  d.showModal(); // form method="dialog" yang menutup kotaknya
+});
+// notifikasi kecil yang hilang sendiri setelah 4 detik
+let kabarTm;
+const kabar = teks => { const t = $('toast'); t.textContent = teks; t.hidden = false; clearTimeout(kabarTm); kabarTm = setTimeout(() => { t.hidden = true; }, 4000); };
 
 // ---- tanggal ----
 const parse = v => { if (!v) return null; const [y, m, d] = v.split('-').map(Number); return new Date(y, m - 1, d); };
@@ -392,8 +423,8 @@ let A, F, auth, db, unsub = () => {};
 const userRef = () => F.doc(db, 'users', auth.currentUser.uid);
 const login = () => A.signInWithPopup(auth, new A.GoogleAuthProvider());
 const loginFail = e => ['auth/popup-closed-by-user', 'auth/cancelled-popup-request'].includes(e.code)
-  || alert(`Gagal masuk (${e.code || e.message}). Coba buka lewat Chrome atau Safari, bukan browser di dalam aplikasi lain.`);
-const saveFail = e => alert(`Gagal menyimpan (${e.code || e.message}).`);
+  || kabar(`Gagal masuk (${e.code || e.message}). Coba buka lewat Chrome atau Safari, bukan browser di dalam aplikasi lain.`);
+const saveFail = e => kabar(`Gagal menyimpan (${e.code || e.message}).`);
 
 // ---- riwayat: koleksi users/{uid}/riwayat, tampil 50 terakhir ----
 const pending = {};
@@ -408,7 +439,7 @@ document.addEventListener('click', async e => {
   if (e.target.closest('[data-login]')) return login().catch(loginFail);
   const b = e.target.closest('[data-save]');
   if (!b) return;
-  if (!auth) return alert('Belum terhubung ke server. Cek internet lalu muat ulang halaman.');
+  if (!auth) return kabar('Belum terhubung ke server. Cek internet lalu muat ulang halaman.');
   const entry = { t: Date.now(), k: b.dataset.save, ...pending[b.dataset.save] };
   if (!auth.currentUser) {
     try { await login(); } catch (er) { return loginFail(er); }
@@ -417,8 +448,10 @@ document.addEventListener('click', async e => {
   F.addDoc(F.collection(userRef(), 'riwayat'), entry).catch(saveFail);
   b.disabled = true; b.textContent = 'Tersimpan';
 });
-$('clearHist').onclick = () => confirm('Hapus semua riwayat?')
-  && F.getDocs(F.collection(userRef(), 'riwayat')).then(s => s.forEach(d => F.deleteDoc(d.ref))).catch(saveFail);
+$('clearHist').onclick = async () => {
+  if (!(await tanya('Hapus semua riwayat?', 'Hapus'))) return;
+  F.getDocs(F.collection(userRef(), 'riwayat')).then(s => { s.forEach(d => F.deleteDoc(d.ref)); kabar('Riwayat dihapus.'); }).catch(saveFail);
+};
 $('logout').onclick = () => A.signOut(auth);
 
 // ---- sapaan ----
@@ -554,34 +587,34 @@ const SLOT = { gaun: 'Gaun', mahkota: 'Mahkota', aksesori: 'Aksesori', latar: 'L
 // warna gaun = cadangan kalau SVG belum termuat; warna latar = kotak contoh di Lemari
 const ITEMS = {
   'gaun-harian': { slot: 'gaun', nama: 'Gaun harian', harga: 0, warna: '#F1E4CF' },
-  'gaun-sakura': { slot: 'gaun', nama: 'Gaun sakura', harga: 150, warna: '#D98CA0' },
-  'gaun-stroberi': { slot: 'gaun', nama: 'Gaun stroberi', harga: 200, warna: '#FFE9C7' },
-  'gaun-mawar': { slot: 'gaun', nama: 'Gaun mawar', harga: 250, warna: '#B87482' },
-  'gaun-peri': { slot: 'gaun', nama: 'Gaun peri', harga: 300, warna: '#C9DDBF' },
-  'gaun-bintang': { slot: 'gaun', nama: 'Gaun bintang malam', harga: 400, warna: '#3B4878' },
-  'gaun-kebaya': { slot: 'gaun', nama: 'Kebaya princess', harga: 500, warna: '#E4CFAE' },
+  'gaun-sakura': { slot: 'gaun', nama: 'Gaun sakura', harga: 250, warna: '#D98CA0' },
+  'gaun-stroberi': { slot: 'gaun', nama: 'Gaun stroberi', harga: 350, warna: '#FFE9C7' },
+  'gaun-mawar': { slot: 'gaun', nama: 'Gaun mawar', harga: 450, warna: '#B87482' },
+  'gaun-peri': { slot: 'gaun', nama: 'Gaun peri', harga: 550, warna: '#C9DDBF' },
+  'gaun-bintang': { slot: 'gaun', nama: 'Gaun bintang malam', harga: 700, warna: '#3B4878' },
+  'gaun-kebaya': { slot: 'gaun', nama: 'Kebaya princess', harga: 900, warna: '#E4CFAE' },
   'seragam-bidan': { slot: 'gaun', nama: 'Seragam bidan', set: 'bidan', warna: '#F2EEE8' },
   'toga-wisuda': { slot: 'gaun', nama: 'Toga wisuda', set: 'wisuda', warna: '#2B2427' },
   'tiara-sederhana': { slot: 'mahkota', nama: 'Tiara sederhana', harga: 0 },
-  'pita-besar': { slot: 'mahkota', nama: 'Pita besar', harga: 100 },
-  'bando-kelinci': { slot: 'mahkota', nama: 'Bando kelinci', harga: 150 },
-  'tiara-bintang': { slot: 'mahkota', nama: 'Tiara bintang', harga: 200 },
-  'mahkota-bunga': { slot: 'mahkota', nama: 'Mahkota bunga', harga: 250 },
-  'mahkota-kristal': { slot: 'mahkota', nama: 'Mahkota kristal', harga: 350 },
+  'pita-besar': { slot: 'mahkota', nama: 'Pita besar', harga: 150 },
+  'bando-kelinci': { slot: 'mahkota', nama: 'Bando kelinci', harga: 250 },
+  'tiara-bintang': { slot: 'mahkota', nama: 'Tiara bintang', harga: 350 },
+  'mahkota-bunga': { slot: 'mahkota', nama: 'Mahkota bunga', harga: 450 },
+  'mahkota-kristal': { slot: 'mahkota', nama: 'Mahkota kristal', harga: 600 },
   'topi-bidan': { slot: 'mahkota', nama: 'Topi bidan', set: 'bidan' },
   'topi-toga': { slot: 'mahkota', nama: 'Topi toga', set: 'wisuda' },
   tanpa: { slot: 'aksesori', nama: 'Tanpa aksesori', harga: 0 },
-  'tas-hati': { slot: 'aksesori', nama: 'Tas hati', harga: 100 },
-  'tongkat-peri': { slot: 'aksesori', nama: 'Tongkat peri', harga: 150 },
-  'payung-renda': { slot: 'aksesori', nama: 'Payung renda', harga: 200 },
-  'anak-kucing': { slot: 'aksesori', nama: 'Anak kucing', harga: 300 },
+  'tas-hati': { slot: 'aksesori', nama: 'Tas hati', harga: 150 },
+  'tongkat-peri': { slot: 'aksesori', nama: 'Tongkat peri', harga: 250 },
+  'payung-renda': { slot: 'aksesori', nama: 'Payung renda', harga: 350 },
+  'anak-kucing': { slot: 'aksesori', nama: 'Anak kucing', harga: 500 },
   // sayap: dari depan digambar paling belakang (di balik badan); ikon Lemari pakai tampak belakang yang utuh
-  'sayap-peri': { slot: 'aksesori', nama: 'Sayap peri', harga: 400, dibelakang: true, ikon: 'belakang' },
+  'sayap-peri': { slot: 'aksesori', nama: 'Sayap peri', harga: 700, dibelakang: true, ikon: 'belakang' },
   'fetoskop-pinard': { slot: 'aksesori', nama: 'Fetoskop Pinard', set: 'bidan' },
   'gulungan-ijazah': { slot: 'aksesori', nama: 'Gulungan ijazah', set: 'wisuda' },
   taman: { slot: 'latar', nama: 'Taman', harga: 0, warna: '#CFE0C8' },
-  istana: { slot: 'latar', nama: 'Istana', harga: 150, warna: '#E6D3CB' },
-  langit: { slot: 'latar', nama: 'Langit malam', harga: 300, warna: '#2C2B48' },
+  istana: { slot: 'latar', nama: 'Istana', harga: 250, warna: '#E6D3CB' },
+  langit: { slot: 'latar', nama: 'Langit malam', harga: 450, warna: '#2C2B48' },
 };
 // set spesial tidak dijual: terbuka dari pencapaian
 const SETS = {
@@ -615,13 +648,15 @@ function renderIstana() {
   document.querySelectorAll('[data-thumb]').forEach(ikonLemari);
   renderAvatar();
 }
-document.addEventListener('click', e => {
+document.addEventListener('click', async e => {
   const b = e.target.closest('[data-item]');
   if (!b) return;
   const id = b.dataset.item, it = ITEMS[id];
   if (!owned(id)) {
-    if (koleksi.poin < it.harga || !confirm(`Beli ${it.nama} seharga ${it.harga} poin?`)) return;
+    if (koleksi.poin < it.harga || !(await tanya(`Beli ${it.nama} seharga ${it.harga} poin?`, 'Beli'))) return;
+    if (koleksi.poin < it.harga) return; // poin sempat berubah selama kotak terbuka
     koleksi.poin -= it.harga; koleksi.punya.push(id);
+    kabar(`${it.nama} dibeli dan langsung dipakai.`);
   }
   koleksi.pakai[it.slot] = id; saveGame(); renderIstana();
 });
