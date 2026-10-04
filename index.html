@@ -617,8 +617,9 @@ const ITEMS = {
   langit: { slot: 'latar', nama: 'Langit malam', harga: 450, warna: '#2C2B48' },
 };
 // set spesial tidak dijual: terbuka dari pencapaian
+const JARAK_BIDAN = 2000; // meter dalam satu ronde untuk membuka Set Bidan
 const SETS = {
-  bidan: { nama: 'Set Bidan', info: 'Terbuka saat lari 1.000 m dalam satu ronde', syarat: () => koleksi.rekor >= 1000 },
+  bidan: { nama: 'Set Bidan', info: `Terbuka saat lari ${JARAK_BIDAN.toLocaleString('id-ID')} m dalam satu ronde`, syarat: () => koleksi.rekor >= JARAK_BIDAN },
   wisuda: { nama: 'Set Wisuda', info: 'Terbuka saat semua BAB sudah ACC', syarat: () => st.bab.every(x => x === 3) },
 };
 const LATAR = {
@@ -786,7 +787,8 @@ function renderAvatar() {
 const cv = $('cv'), gc = cv.getContext('2d'), Z0 = 7, FAR = 60, AMBIL = { permata: 1, mahkota: 10 };
 let run = null, sentuh = null;
 // revisi = lompati, palang = merunduk di tanah, tembok = harus pindah jalur
-const lolos = (jenis, y, slide) => jenis === 'revisi' ? y > 1.2 : jenis === 'palang' ? slide > 0 && y === 0 : false;
+// tinggi lompatan (satuan U): puncak ±1,95. revisi setinggi 1,1 dan tembok setinggi 1,5 harus dilewati di atas tingginya
+const lolos = (jenis, y, slide) => jenis === 'revisi' ? y > 1.2 : jenis === 'tembok' ? y > 1.5 : jenis === 'palang' ? slide > 0 && y === 0 : false;
 
 function sizeCanvas() { const d = Math.min(devicePixelRatio || 1, 2); cv.width = innerWidth * d; cv.height = innerHeight * d; gc.setTransform(d, 0, 0, d, 0, 0); }
 function mulai() {
@@ -840,7 +842,7 @@ function gerak(arah) {
 function selesai(r, sebab) {
   r.over = true;
   const jarak = Math.floor(r.dist), dapat = r.gems + Math.floor(jarak / 50), masuk = !!auth?.currentUser;
-  const rekorBaru = jarak > koleksi.rekor, bidanBaru = rekorBaru && koleksi.rekor < 1000 && jarak >= 1000;
+  const rekorBaru = jarak > koleksi.rekor, bidanBaru = rekorBaru && koleksi.rekor < JARAK_BIDAN && jarak >= JARAK_BIDAN;
   if (masuk) { koleksi.poin += dapat; if (rekorBaru) koleksi.rekor = jarak; saveGame(); renderIstana(); }
   $('akhirRows').innerHTML = rows([['Jarak', jarak + ' m'], ['Permata', r.gems], ['Poin', (masuk ? '+' : '') + dapat]]);
   $('akhirNote').textContent = (sebab === 'monster' ? 'Kena monster! Poin yang sudah terkumpul tetap dihitung. ' : '')
@@ -915,9 +917,9 @@ function benda1(c, o, x, y, s, t) {
     rr(c, '#FFFFFF', x - 1.45 * s, y - 3.7 * s, 2.9 * s, 0.55 * s, 0.08 * s);
     for (let i = 0; i < 5; i += 2) rr(c, '#A0606A', x - 1.45 * s + i * 0.58 * s, y - 3.7 * s, 0.58 * s, 0.55 * s, 0.04 * s);
   } else {
-    rr(c, '#BBAA98', x - 1.3 * s, y - 3.4 * s, 2.6 * s, 3.4 * s, 0.1 * s);
+    rr(c, '#BBAA98', x - 1.3 * s, y - 1.5 * s, 2.6 * s, 1.5 * s, 0.1 * s); // tembok batu rendah, bisa dilompati
     c.strokeStyle = '#9F8D7C'; c.lineWidth = Math.max(1, 0.05 * s); c.beginPath();
-    for (let i = 1; i < 5; i++) { const ly = y - i * 0.68 * s, ox = (i % 2 ? -0.4 : 0.4) * s; c.moveTo(x - 1.3 * s, ly); c.lineTo(x + 1.3 * s, ly); c.moveTo(x + ox, ly); c.lineTo(x + ox, ly + 0.68 * s); }
+    for (let i = 1; i <= 3; i++) { const ly = y - i * 0.5 * s, ox = (i % 2 ? -0.4 : 0.4) * s; if (i < 3) { c.moveTo(x - 1.3 * s, ly); c.lineTo(x + 1.3 * s, ly); } c.moveTo(x + ox, ly); c.lineTo(x + ox, ly + 0.5 * s); }
     c.stroke();
   }
 }
@@ -927,7 +929,7 @@ function hud(c, r, W, H, L) {
   c.fillText(Math.floor(r.dist) + ' m', W / 2, 30);
   poly(c, '#E0708F', [[W - 92, 20], [W - 84, 30], [W - 92, 40], [W - 100, 30]]);
   c.fillStyle = L.hud; c.textAlign = 'left'; c.fillText(r.gems, W - 78, 30);
-  if (r.t < 5) pesan(c, W, H, ['Geser kiri/kanan: pindah jalur', 'Atas: lompati REVISI · Bawah: runduk', 'Monster: sekali kena, langsung selesai']);
+  if (r.t < 5) pesan(c, W, H, ['Geser kiri/kanan: pindah jalur', 'Geser atas: lompati REVISI dan tembok', 'Geser bawah: runduk di bawah palang', 'Monster: sekali kena, langsung selesai']);
   if (r.paused) { c.fillStyle = 'rgba(0,0,0,.35)'; c.fillRect(0, 0, W, H); pesan(c, W, H, ['Dijeda', 'Ketuk untuk lanjut']); }
 }
 function hati(c, fill, x, y, s) {
@@ -1003,7 +1005,7 @@ if (location.search.includes('test')) {
   eq(lemeshow(1.96, 0.5, 0.1, 200), 66, 'Lemeshow N=200');
   eq(dropout(97, 0.1), 108, 'drop-out');
   eq(esc('<b>&"'), '&lt;b&gt;&amp;&quot;', 'escape');
-  eq([lolos('revisi', 1.5, 0), lolos('revisi', 0, 0), lolos('palang', 0, 0.3), lolos('palang', 1, 0.3), lolos('tembok', 2, 0.3), lolos('monster', 2, 0.3)].join(), 'true,false,true,false,false,false', 'rintangan');
+  eq([lolos('revisi', 1.5, 0), lolos('revisi', 0, 0), lolos('palang', 0, 0.3), lolos('palang', 1, 0.3), lolos('tembok', 1.8, 0), lolos('tembok', 1.3, 0), lolos('monster', 2, 0.3)].join(), 'true,false,true,false,true,false,false', 'rintangan');
   console.log('self-check selesai');
 }
 </script>
