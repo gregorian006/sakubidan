@@ -1,0 +1,3 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="600" viewBox="0 0 300 600">
+<g transform="rotate(-18 218 398) translate(218 398) scale(1.35) translate(-218 -398)"><rect x="172" y="384" width="92" height="28" rx="14" fill="#CDB894"/><rect x="174" y="386" width="88" height="24" rx="12" fill="#F3EBDD"/><ellipse cx="256" cy="398" rx="7" ry="12" fill="#CDB894"/><ellipse cx="256" cy="398" rx="3" ry="6" fill="#F3EBDD"/><rect x="212" y="385" width="12" height="26" rx="2" fill="#B23A48"/><path fill="#B23A48" d="M218,398 C208,376 196,382 204,394 Z"/><path fill="#B23A48" d="M218,398 C228,376 240,382 232,394 Z"/><polygon fill="#B23A48" points="215,402 208,424 214,421 218,426 219,404"/><polygon fill="#B23A48" points="221,402 228,424 222,421 218,426 217,404"/></g>
+</svg>
