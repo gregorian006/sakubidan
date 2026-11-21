@@ -3,19 +3,19 @@
 //   GET/POST dengan header Authorization: Bearer CRON_SECRET -> kirim pengingat yang jatuh tempo (dipanggil cron eksternal tiap 5-15 menit)
 //   POST dengan header Authorization: Bearer <Firebase ID token> -> kirim notifikasi tes ke HP milik user itu
 import { timingSafeEqual } from 'node:crypto';
-import * as webpush from 'web-push';
-import { initializeApp, cert, getApps } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
-import { getAuth } from 'firebase-admin/auth';
 import { jatuhTempo } from './_jadwal.js';
 
 const env = process.env;
-let db;
-function siap() {
+// library berat dimuat saat dibutuhkan saja: ?kunci tetap jalan, dan kalau setup salah pesannya jelas (bukan crash)
+let db, webpush, getAuth;
+async function siap() {
   if (db) return;
-  const app = getApps()[0] || initializeApp({ credential: cert(JSON.parse(env.FIREBASE_SERVICE_ACCOUNT)) });
-  db = getFirestore(app);
-  webpush.setVapidDetails(env.VAPID_SUBJECT, env.VAPID_PUBLIC_KEY, env.VAPID_PRIVATE_KEY);
+  const [fApp, fStore, fAuth, wp] = await Promise.all([import('firebase-admin/app'), import('firebase-admin/firestore'), import('firebase-admin/auth'), import('web-push')]);
+  const kurang = ['FIREBASE_SERVICE_ACCOUNT', 'VAPID_PUBLIC_KEY', 'VAPID_PRIVATE_KEY', 'VAPID_SUBJECT', 'CRON_SECRET'].filter(k => !env[k]);
+  if (kurang.length) throw new Error('env Vercel belum diisi: ' + kurang.join(', '));
+  const app = fApp.getApps()[0] || fApp.initializeApp({ credential: fApp.cert(JSON.parse(env.FIREBASE_SERVICE_ACCOUNT)) });
+  wp.setVapidDetails(env.VAPID_SUBJECT, env.VAPID_PUBLIC_KEY, env.VAPID_PRIVATE_KEY);
+  webpush = wp; getAuth = fAuth.getAuth; db = fStore.getFirestore(app);
 }
 
 const samaRahasia = s => {
@@ -36,7 +36,7 @@ export default async function handler(req, res) {
   if (req.method === 'GET' && 'kunci' in req.query) return res.json({ publicKey: env.VAPID_PUBLIC_KEY });
   const token = (req.headers.authorization || '').replace(/^Bearer\s+/i, '');
   if (!token) return res.status(401).json({ error: 'butuh Authorization' });
-  siap();
+  try { await siap(); } catch (e) { console.error(e); return res.status(500).json({ error: 'server belum siap: ' + e.message }); }
 
   if (samaRahasia(token)) {
     const now = Date.now(), perUser = {};

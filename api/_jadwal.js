@@ -1,5 +1,6 @@
 // Logika jadwal pengingat (tanpa Firebase, supaya bisa dites: node api/_jadwal.js).
 // File berawalan _ tidak dijadikan endpoint oleh Vercel.
+import assert from 'node:assert/strict';
 
 const TEKS = {
   posisi: ['Ganti posisi', 'Ubah posisi, lalu cek kulit di area yang tertekan.'],
@@ -46,7 +47,6 @@ export function jatuhTempo(cg, now, terkirim = {}) {
 
 // self-check
 if (process.argv[1]?.endsWith('_jadwal.js')) {
-  const { strict: assert } = await import('node:assert');
   const jkt = (h, m) => Date.UTC(2026, 10, 23, h - 7, m); // jam Jakarta (UTC+7)
   const cg = { tz: 'Asia/Jakarta', pengingat: { minumSaya: { on: false, tiap: 60, mulai: '07:00', selesai: '21:00' } }, pasien: [
     { id: 'pa', nama: 'Ny. Siti', kamar: 'K-03', pengingat: {
