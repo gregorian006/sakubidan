@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#F5EFE7">
 <title>Saku Bidan</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Saku Bidan">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <script>
 // tema dipasang sebelum halaman tampil (tanpa kedip): pilihan tersimpan, kalau belum ada ikut setting HP
 let tema; try { tema = localStorage.getItem('tema'); } catch (e) {}
@@ -71,7 +76,7 @@ h1 svg{width:24px;height:20px;flex:none;margin-top:-4px;color:var(--gold);fill:c
 #fbStatus:empty{display:none}
 
 /* ---- tab bawah ---- */
-.tabs{position:fixed;z-index:2;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:var(--content-max);display:grid;grid-template-columns:repeat(4,1fr);padding-bottom:env(safe-area-inset-bottom);background:var(--bg);border-top:1px solid var(--line)}
+.tabs{position:fixed;z-index:2;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:var(--content-max);display:grid;grid-template-columns:repeat(5,1fr);padding-bottom:env(safe-area-inset-bottom);background:var(--bg);border-top:1px solid var(--line)}
 .tabs button{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:var(--nav-h);padding:0;border:0;background:none;font:600 12px/16px var(--font-sans);color:var(--ink-2);cursor:pointer}
 .tabs svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 .tabs button[aria-selected=true]{color:var(--ink)}
@@ -190,6 +195,50 @@ fieldset:disabled{opacity:.5}
 #tanya .btn{flex:1;margin-top:0}
 #toast{position:fixed;z-index:20;left:50%;bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 12px);transform:translateX(-50%);width:max-content;max-width:min(92vw,440px);padding:12px 16px;color:var(--bg);background:var(--ink);border-radius:var(--radius);box-shadow:0 6px 20px rgba(0,0,0,.22);font:500 14px/20px var(--font-sans)}
 
+/* ---- panduan pasang di iPhone ---- */
+#pasang{margin:var(--space-4) var(--space-4) 0}
+#pasang ol{margin:6px 0 0;padding-left:20px}
+
+/* ---- caregiver ---- */
+.seg.menu .opt{justify-content:center;padding:0 4px}
+.seg.menu .opt input{position:absolute;opacity:0;pointer-events:none}
+.seg .btn{margin-top:var(--space-3)}
+.cek{display:flex;align-items:center;gap:var(--space-3);min-height:var(--control-h);margin:0;padding:6px 0;border-bottom:1px solid var(--line);font:500 16px/22px var(--font-sans);color:var(--ink);cursor:pointer}
+.cek span{flex:1;display:flex;flex-direction:column}
+.cek small{font:400 13px/18px var(--font-sans);color:var(--ink-2)}
+.cek input{flex:none;width:28px;height:28px;min-height:0;margin:0;padding:0;-webkit-appearance:none;appearance:none;border:1.5px solid var(--line-strong);border-radius:var(--radius);background:var(--field) center/18px no-repeat}
+.cek input:checked{border-color:var(--accent);background-color:var(--accent);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7' fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
+:root[data-theme=dark] .cek input:checked{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7' fill='none' stroke='%232B1A1F' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
+.seg.menu{grid-template-columns:repeat(3,1fr)}
+/* tab Pasien bergaya daftar akun */
+.akun{display:flex;align-items:center;gap:var(--space-3);width:100%;min-height:76px;margin:0;padding:var(--space-2) 0;border:0;border-bottom:1px solid var(--line);background:none;color:var(--ink);text-align:left;font:inherit;cursor:pointer}
+.akun:first-child{border-top:1px solid var(--line)}
+#cariPasien{margin-bottom:var(--space-4);-webkit-appearance:none;appearance:none}
+.ava{flex:none;display:grid;place-items:center;width:52px;height:52px;border-radius:50%;background:var(--accent-soft);color:var(--accent-text);font:600 18px/1 var(--font-serif);letter-spacing:.02em}
+.ava.xl{width:76px;height:76px;font-size:28px}
+.akun .k,.akun-top .k{flex:1;min-width:0;display:flex;flex-direction:column}
+.akun b,.akun-top b{font:600 19px/25px var(--font-serif)}
+.akun-top b{font-size:24px;line-height:30px;overflow-wrap:anywhere}
+.akun small,.akun-top small{font:400 14px/20px var(--font-sans);color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tag{flex:none;padding:3px 8px;border:1px solid var(--accent);border-radius:var(--radius);background:var(--accent-soft);font:600 12px/16px var(--font-sans);color:var(--accent-text)}
+.chev svg{display:block;width:20px;height:20px;fill:none;stroke:var(--ink-2);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.akun-top{display:flex;align-items:center;gap:var(--space-4);padding-bottom:var(--space-4);border-bottom:1px solid var(--line)}
+.row.jam .btn{flex:none;width:auto;margin-top:0;min-height:var(--control-h)}
+.jam-list{display:flex;flex-wrap:wrap;gap:var(--space-2);margin-top:var(--space-2)}
+.jam-list:empty{display:none}
+.jam-list button{display:flex;align-items:center;gap:6px;min-height:var(--tap-min);padding:0 12px;border:1px solid var(--line-strong);border-radius:var(--radius);background:var(--field);color:var(--ink);font:500 16px/20px var(--font-sans);cursor:pointer}
+.jam-list svg{width:16px;height:16px;fill:none;stroke:var(--ink-2);stroke-width:2;stroke-linecap:round}
+.pg{padding-bottom:var(--space-4);border-bottom:1px solid var(--line)}
+.pg .cek{border-bottom:0}
+.pg .row .lbl{margin-top:0}
+.pg .row{gap:var(--space-2)}
+.pg input[type=time]{padding:0 6px}
+.pg .row .icon{align-self:flex-end;height:var(--control-h)}
+#caregiver.besar{--control-h:60px;--tap-min:56px}
+#caregiver.besar :is(input,select,textarea,.opt,.btn,.cek){font-size:18px}
+#caregiver.besar .cek{min-height:64px}
+#caregiver.besar .cek input{width:34px;height:34px}
+
 footer{padding:var(--space-5) var(--space-4);font:italic 400 14px/20px var(--font-serif);color:var(--ink-2)}
 
 @media (max-width:359px){
@@ -220,11 +269,24 @@ footer{padding:var(--space-5) var(--space-4);font:italic 400 14px/20px var(--fon
     <p class="note" id="fbStatus"></p>
   </header>
 
+  <div class="gate" id="pasang" hidden>
+    <b>Pasang Saku Bidan di layar utama iPhone</b>
+    <ol>
+      <li>Buka halaman ini di Safari.</li>
+      <li>Tekan tombol Bagikan (kotak dengan panah ke atas). Kalau tidak terlihat, tekan menu titik tiga dulu.</li>
+      <li>Pilih Tambah ke Layar Utama, lalu Tambah.</li>
+      <li>Buka Saku Bidan dari ikonnya, lalu masuk dengan Google lagi.</li>
+    </ol>
+    <p class="note">Pengingat di iPhone butuh iOS 16.4 atau lebih baru dan hanya jalan dari ikon di layar utama.</p>
+    <button class="link" id="pasangTutup" type="button">Tutup</button>
+  </div>
+
   <nav class="tabs" role="tablist" aria-label="Bagian">
     <button role="tab" aria-selected="true" data-tab="klinik"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="1.5"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>Klinik</button>
     <button role="tab" aria-selected="false" data-tab="riset"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4M9 12h7M9 16h7"/></svg>Penelitian</button>
     <button role="tab" aria-selected="false" data-tab="riwayat"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>Riwayat</button>
     <button role="tab" aria-selected="false" data-tab="istana"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17 3 8l5 4 4-7 4 7 5-4-1 9z"/><path d="M4 20h16"/></svg>Istana</button>
+    <button role="tab" aria-selected="false" data-tab="caregiver"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7a4.3 4.3 0 0 1 7.5 2.8C19.5 15.4 12 20 12 20z"/></svg>Caregiver</button>
   </nav>
 
   <div id="klinik">
@@ -324,6 +386,75 @@ footer{padding:var(--space-5) var(--space-4);font:italic 400 14px/20px var(--fon
     </section>
   </div>
 
+  <div id="caregiver" class="besar" hidden>
+    <section>
+      <h2>Caregiver <button class="link" id="besar" type="button" aria-pressed="true">Tombol besar: nyala</button></h2>
+      <p class="gate if-out" hidden>Masuk dengan Google supaya pasien, pengingat, dan catatan tersimpan. <button class="link" data-login>Masuk</button></p>
+      <div class="seg menu" id="cgMenu" role="radiogroup" aria-label="Bagian caregiver">
+        <label class="opt"><input type="radio" name="cgMenu" value="cgPasien">Pasien</label>
+        <label class="opt"><input type="radio" name="cgMenu" value="cgPengingat" checked>Pengingat</label>
+        <label class="opt"><input type="radio" name="cgMenu" value="cgCatatan">Catatan</label>
+      </div>
+      <div id="aktifBox">
+        <label for="pasienAktif">Pasien yang dirawat</label>
+        <select id="pasienAktif"></select>
+        <p class="note" id="aktifInfo"></p>
+      </div>
+      <p class="note" id="belumPasien" hidden>Belum ada pasien. <button class="link" type="button" data-ke="cgPasien">Tambah pasien</button></p>
+    </section>
+
+    <section id="cgPasien" hidden>
+      <h2>Pasien <small>penanganan per pasien</small></h2>
+      <fieldset class="cgf" disabled>
+        <input type="search" id="cariPasien" aria-label="Cari pasien" placeholder="Cari nama, kamar, atau penanganan" autocomplete="off">
+        <div id="pasienList"></div>
+        <button class="btn" id="pasienTambah" type="button">Tambah pasien</button>
+        <button class="btn quiet" id="unduhExcel" type="button">Unduh Excel semua pasien</button>      </fieldset>
+    </section>
+
+    <section id="cgPengingat">
+      <h2>Pengingat <small>dikirim dari server</small></h2>
+      <fieldset class="cgf" disabled>
+        <p class="note" id="pushStatus" style="margin-top:0"></p>
+        <button class="btn" id="pushOn" type="button">Aktifkan Pengingat</button>
+        <div class="seg" id="pushAktif" hidden>
+          <button class="btn quiet" id="pushTes" type="button">Kirim tes</button>
+          <button class="btn quiet" id="pushOff" type="button">Matikan di HP ini</button>
+        </div>
+        <div id="pgList"></div>
+        <button class="btn quiet" id="obatTambah" type="button">Tambah jadwal obat</button>
+        <h3>Untuk Princess</h3>
+        <div id="pgSaya"></div>
+      </fieldset>
+    </section>
+
+    <section id="cgCatatan" hidden>
+      <h2>Catatan harian <small>per pasien</small></h2>
+      <fieldset class="cgf" id="ctForm" disabled>
+        <label for="ctTgl" style="margin-top:0">Tanggal</label><input type="date" id="ctTgl">
+        <label for="ctBabJam">Jam BAB</label>
+        <div class="row jam"><div><input type="time" id="ctBabJam"></div><button class="btn quiet" type="button" data-jam="Bab">Tambah</button></div>
+        <div class="jam-list" id="ctBabList"></div><input type="hidden" id="ctBab">
+        <label for="ctBakJam">Jam BAK</label>
+        <div class="row jam"><div><input type="time" id="ctBakJam"></div><button class="btn quiet" type="button" data-jam="Bak">Tambah</button></div>
+        <div class="jam-list" id="ctBakList"></div><input type="hidden" id="ctBak">
+        <label for="ctFeses">Kondisi feses</label>
+        <select id="ctFeses"><option value="">Belum diisi</option><option>Normal, lunak berbentuk</option><option>Keras</option><option>Cair</option><option>Ada darah atau lendir</option><option>Hitam</option><option>Tidak BAB</option></select>
+        <label for="ctKulit">Kondisi kulit</label>
+        <select id="ctKulit"><option value="">Belum diisi</option><option>Utuh</option><option>Kemerahan</option><option>Lecet</option><option>Luka tekan</option><option>Lainnya, lihat catatan</option></select>
+        <div class="row" style="margin-top:var(--space-4)">
+          <div><label for="ctMakan">Makan</label><select id="ctMakan"><option value="">Belum diisi</option><option>Habis</option><option>Setengah</option><option>Sedikit</option><option>Tidak mau makan</option></select></div>
+          <div><label for="ctMinum">Minum (gelas)</label><input id="ctMinum" type="number" inputmode="decimal" min="0" step="0.5" placeholder="mis. 6"></div>
+        </div>
+        <label for="ctObat">Obat yang diberikan</label><input id="ctObat" maxlength="80" placeholder="mis. amlodipin 07.00">
+        <label for="ctCatatan">Catatan</label><textarea id="ctCatatan" maxlength="500" placeholder="mis. tidur siang 2 jam, mengeluh pusing pagi"></textarea>
+        <button class="btn" id="ctSimpan" type="button">Simpan catatan</button>
+      </fieldset>
+      <h3>Catatan terakhir</h3>
+      <div id="ctList"></div>
+    </section>
+  </div>
+
   <footer>Alat bantu hitung. Tetap ikuti protokol dan arahan pembimbing.</footer>
 </main>
 
@@ -353,10 +484,14 @@ footer{padding:var(--space-5) var(--space-4);font:italic 400 14px/20px var(--fon
 <script>
 // Ganti dengan config dari Firebase Console > Project settings > Your apps > Web app.
 // Config ini memang terlihat publik; yang menjaga data adalah firestore.rules.
+// dibuka dari ikon layar utama (PWA)? Di iPhone popup login tidak bisa kembali ke app, jadi pakai redirect.
+// Redirect butuh authDomain = domain halaman (pihak ketiga diblokir Safari); /__/auth tersedia di semua domain vercel.app ini.
+const IOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const STANDALONE = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
 const FIREBASE_CONFIG = {
   apiKey: 'AIzaSyCk401IqoWD7WpUS6ZwHSp-3XsOPRrxbK4',
   // domain yang tampil di popup login Google; /__/auth diteruskan ke firebaseapp.com lewat vercel.json
-  authDomain: 'sakubidanbygreg.vercel.app',
+  authDomain: STANDALONE && location.hostname.endsWith('.vercel.app') ? location.host : 'sakubidanbygreg.vercel.app',
   projectId: 'saku-bidan-19937',
   appId: '1:371671019753:web:84ccbbd51ca87542650078',
 };
@@ -421,7 +556,7 @@ const dropout = (n, f) => up(n / (1 - f));
 // ---- Firebase (diisi setelah SDK termuat, lihat bagian paling bawah) ----
 let A, F, auth, db, unsub = () => {};
 const userRef = () => F.doc(db, 'users', auth.currentUser.uid);
-const login = () => A.signInWithPopup(auth, new A.GoogleAuthProvider());
+const login = () => (STANDALONE ? A.signInWithRedirect : A.signInWithPopup)(auth, new A.GoogleAuthProvider());
 const loginFail = e => ['auth/popup-closed-by-user', 'auth/cancelled-popup-request'].includes(e.code)
   || kabar(`Gagal masuk (${e.code || e.message}). Coba buka lewat Chrome atau Safari, bukan browser di dalam aplikasi lain.`);
 const saveFail = e => kabar(`Gagal menyimpan (${e.code || e.message}).`);
@@ -963,6 +1098,343 @@ $('main').onclick = mulai; $('lagi').onclick = mulai; $('keIstana').onclick = tu
 $('stop').onclick = () => run && !run.over ? selesai(run) : tutupGame();
 renderIstana();
 
+// ---- Caregiver: field "caregiver" di users/{uid}, catatan di users/{uid}/catatan, langganan push di users/{uid}/push ----
+// pengingat dihitung dan dikirim oleh server (api/pengingat.js) yang dipanggil cron eksternal, bukan timer di browser
+const PG_PASIEN = [
+  ['posisi', 'Ganti posisi', 'cegah luka tekan, biasanya tiap 2 jam'],
+  ['minumLansia', 'Minum air', 'tawarkan minum berkala'],
+];
+const PG_SAYA = [['minumSaya', 'Minum air untuk Princess', 'jaga diri sendiri juga']];
+const TIAP = [30, 60, 90, 120, 180, 240];
+const CT = ['Bab', 'Bak', 'Feses', 'Kulit', 'Makan', 'Minum', 'Obat', 'Catatan'];
+const jadwal0 = tiap => ({ on: false, tiap, mulai: '07:00', selesai: '21:00' });
+const PASIEN0 = () => ({ id: 'p-' + Date.now().toString(36), nama: '', kamar: '', info: '', pengingat: { posisi: jadwal0(120), minumLansia: jadwal0(120), obat: [] } });
+const CG0 = () => ({ pengingat: { minumSaya: jadwal0(60) }, pasien: [] });
+const gabungCg = d => {
+  const c = CG0();
+  c.pengingat.minumSaya = { ...c.pengingat.minumSaya, ...d?.pengingat?.minumSaya };
+  c.pasien = (d?.pasien || []).map(({ cek, ...p }) => { const b = PASIEN0(); return { ...b, ...p, pengingat: { ...b.pengingat, ...p.pengingat } }; }); // cek: sisa checklist lama
+  return c;
+};
+let cg = CG0(), cgTm, catatan = [], unsubCt = () => {}, aktifId;
+try { aktifId = localStorage.getItem('pasienAktif'); } catch (e) {}
+const aktif = () => cg.pasien.find(p => p.id === aktifId) || cg.pasien[0];
+const namaPasien = p => (p.nama || 'Tanpa nama') + (p.kamar ? ' · ' + p.kamar : '');
+// jeda 0,8 detik seperti progress skripsi; zona waktu HP ikut disimpan supaya server tahu jam lokalnya
+const saveCg = () => { clearTimeout(cgTm); cgTm = setTimeout(() => {
+  if (!auth?.currentUser) return;
+  cg.tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  F.setDoc(userRef(), { caregiver: cg }, { mergeFields: ['caregiver'] }).catch(saveFail);
+}, 800); };
+const renderCg = () => { renderAktif(); renderPasien(); renderPg(); renderCt(); paintPush(); };
+
+const menu = () => picked('cgMenu');
+on(['cgMenu'], () => {
+  ['cgPasien', 'cgPengingat', 'cgCatatan'].forEach(id => { $(id).hidden = menu() !== id; });
+  renderAktif(); renderPg(); isiCtAktif(); jamSekarang();
+});
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-ke]');
+  if (b) document.querySelector(`input[name=cgMenu][value=${b.dataset.ke}]`).click();
+});
+let besar = true;
+try { besar = localStorage.getItem('besar') !== '0'; } catch (e) {}
+const paintBesar = () => { $('caregiver').classList.toggle('besar', besar); $('besar').setAttribute('aria-pressed', besar); $('besar').textContent = 'Tombol besar: ' + (besar ? 'nyala' : 'mati'); };
+$('besar').onclick = () => { besar = !besar; try { localStorage.setItem('besar', besar ? '1' : '0'); } catch (e) {} paintBesar(); };
+paintBesar();
+
+// pasien yang sedang dirawat: dipilih sekali, dipakai di pengingat, checklist, dan catatan
+function renderAktif() {
+  const p = aktif(), ada = !!p, diPasien = menu() === 'cgPasien';
+  $('aktifBox').hidden = !ada || diPasien;
+  $('belumPasien').hidden = ada || diPasien;
+  $('pasienAktif').innerHTML = cg.pasien.map(x => `<option value="${esc(x.id)}"${x === p ? ' selected' : ''}>${esc(namaPasien(x))}</option>`).join('');
+  $('aktifInfo').textContent = p?.info ? 'Penanganan: ' + p.info : '';
+}
+const pilihPasien = id => {
+  aktifId = id;
+  try { localStorage.setItem('pasienAktif', aktifId); } catch (e) {}
+  renderAktif(); renderPasien(); renderPg(); isiCtAktif();
+};
+$('pasienAktif').onchange = () => pilihPasien($('pasienAktif').value);
+
+// tab Pasien bergaya daftar akun: baris avatar + nama, ketuk untuk membuka profil pasien
+let bukaId = null;
+const inisial = n => {
+  const w = n.replace(/^(ny|tn|nn|nona|bapak|bpk|ibu|oma|opa)\.?\s+/i, '').split(/\s+/).filter(Boolean);
+  return ((w[0]?.[0] || '') + (w[1]?.[0] || '')).toUpperCase() || '?';
+};
+const chev = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
+function renderPasien() {
+  const p = cg.pasien.find(x => x.id === bukaId);
+  $('pasienTambah').hidden = $('unduhExcel').hidden = !!p;
+  $('cariPasien').hidden = !!p || !cg.pasien.length;
+  if (!p) {
+    const q = $('cariPasien').value.trim().toLowerCase();
+    const cocok = cg.pasien.filter(x => [x.nama, x.kamar, x.info].join(' ').toLowerCase().includes(q));
+    if (cg.pasien.length && !cocok.length) return $('pasienList').innerHTML = '<p class="note" style="margin-top:0">Tidak ada pasien yang cocok.</p>';
+    $('pasienList').innerHTML = cocok.map(x => `<button class="akun" type="button" data-buka="${esc(x.id)}">
+        <span class="ava">${esc(inisial(x.nama))}</span>
+        <span class="k"><b>${esc(x.nama || 'Tanpa nama')}</b><small>${esc([x.kamar && 'Kamar ' + x.kamar, x.info].filter(Boolean).join(' · ') || 'Belum ada keterangan')}</small></span>
+        ${x === aktif() ? '<span class="tag">Dirawat</span>' : ''}<span class="chev">${chev}</span>
+      </button>`).join('') || '<p class="note" style="margin-top:0">Belum ada pasien.</p>';
+    return;
+  }
+  const dirawat = p === aktif();
+  $('pasienList').innerHTML = `<div class="akun-top"><span class="ava xl" id="pAva">${esc(inisial(p.nama))}</span>
+      <span class="k"><b id="pNama">${esc(p.nama || 'Pasien baru')}</b><small>${dirawat ? 'Sedang dirawat' : 'Profil pasien'}</small></span></div>
+    <div class="row">
+      <div style="flex:2"><label for="pn">Nama</label><input id="pn" data-k="nama" maxlength="40" value="${esc(p.nama)}" placeholder="mis. Ny. Siti Aminah"></div>
+      <div><label for="pk">Kamar</label><input id="pk" data-k="kamar" maxlength="10" value="${esc(p.kamar)}" placeholder="mis. K-03"></div>
+    </div>
+    <label for="pi">Penanganan khusus</label>
+    <textarea id="pi" data-k="info" maxlength="300" placeholder="mis. tirah baring, diabetes, diet rendah garam, alergi">${esc(p.info)}</textarea>
+    ${dirawat ? '' : '<button class="btn" type="button" data-rawat>Rawat pasien ini</button>'}
+    <button class="btn quiet" type="button" data-kembali>Kembali ke daftar</button>
+    <button class="btn quiet" type="button" data-hapus-pasien>Hapus pasien</button>`;
+}
+on(['cariPasien'], renderPasien);
+// ubahan langsung tersimpan (jeda 0,8 detik); judul dan avatar ikut berubah tanpa menggambar ulang input
+$('pasienList').oninput = e => {
+  const k = e.target.dataset.k, p = cg.pasien.find(x => x.id === bukaId);
+  if (!k || !p) return;
+  p[k] = e.target.value;
+  if (k === 'nama') { $('pNama').textContent = p.nama || 'Pasien baru'; $('pAva').textContent = inisial(p.nama); }
+  renderAktif(); saveCg();
+};
+const tutupProfil = () => {
+  const p = cg.pasien.find(x => x.id === bukaId);
+  // pasien baru yang dibiarkan kosong tidak disimpan
+  if (p && !p.nama.trim() && !p.kamar.trim() && !p.info.trim()) { cg.pasien.splice(cg.pasien.indexOf(p), 1); saveCg(); }
+  bukaId = null; renderCg();
+};
+$('pasienList').onclick = async e => {
+  const t = e.target, p = cg.pasien.find(x => x.id === bukaId);
+  const buka = t.closest('[data-buka]');
+  if (buka) { bukaId = buka.dataset.buka; renderPasien(); return $('cgPasien').scrollIntoView(); }
+  if (t.closest('[data-kembali]')) return tutupProfil();
+  if (t.closest('[data-rawat]')) { pilihPasien(p.id); renderPasien(); return kabar(`Sekarang merawat ${namaPasien(p)}.`); }
+  if (t.closest('[data-hapus-pasien]')) {
+    if (!(await tanya(`Hapus ${namaPasien(p)} beserta pengingatnya? Catatan harian tetap tersimpan.`, 'Hapus'))) return;
+    cg.pasien.splice(cg.pasien.indexOf(p), 1); bukaId = null; renderCg(); saveCg();
+  }
+};
+$('pasienTambah').onclick = () => {
+  const p = PASIEN0();
+  cg.pasien.push(p); bukaId = p.id;
+  if (cg.pasien.length === 1) pilihPasien(p.id);
+  renderCg();
+  $('pn').focus();
+};
+
+// unduh Excel: satu sheet per pasien berisi data pasien dan semua catatan harian, bergaris seperti tabel.
+// xlsx-js-style (SheetJS + dukungan garis/warna sel) dimuat dari CDN hanya saat tombol ditekan
+const XLSX_URL = 'https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js';
+const muatXlsx = () => window.XLSX ? Promise.resolve(window.XLSX) : new Promise((ok, gagal) => {
+  const s = document.createElement('script');
+  s.src = XLSX_URL; s.onload = () => ok(window.XLSX); s.onerror = () => gagal(new Error('library Excel tidak termuat'));
+  document.head.append(s);
+});
+$('unduhExcel').onclick = async () => {
+  const b = $('unduhExcel');
+  b.disabled = true; b.textContent = 'Menyiapkan Excel...';
+  try {
+    const [X, s] = await Promise.all([muatXlsx(), F.getDocs(F.collection(userRef(), 'catatan'))]);
+    const semua = s.docs.map(d => d.data()).sort((a, c) => a.tgl < c.tgl ? -1 : a.tgl > c.tgl ? 1 : 0);
+    const wb = X.utils.book_new(), dipakai = new Set();
+    // nama sheet Excel: maks 31 huruf, tanpa []:*?/\ dan tidak boleh kembar
+    const namaSheet = n => {
+      let t = n.replace(/[[\]:*?/\\]/g, '-').slice(0, 28) || 'Pasien', i = 2;
+      while (dipakai.has(t.toLowerCase())) t = t.slice(0, 26) + ' ' + i++;
+      dipakai.add(t.toLowerCase());
+      return t;
+    };
+    const KOLOM = ['Tanggal', 'Jam BAB', 'Jam BAK', 'Feses', 'Kulit', 'Makan', 'Minum (gelas)', 'Obat', 'Catatan'];
+    const garis = { style: 'thin', color: { rgb: '9A8878' } }, border = { top: garis, bottom: garis, left: garis, right: garis };
+    // numFmt ditulis eksplisit: tanpa ini format tanggal ikut terpasang ke angka lain (mis. minum 6 jadi 06/01/1900)
+    const sel = { border, alignment: { vertical: 'top', wrapText: true }, numFmt: 'General' }, tebal = { ...sel, font: { bold: true } };
+    const tgl = { ...sel, numFmt: 'dd/mm/yyyy' };
+    const judul = { ...tebal, fill: { patternType: 'solid', fgColor: { rgb: 'EFE2DE' } } };
+    // info = [[label, isi], ...] di atas, lalu satu baris kosong, lalu tabel catatan
+    const tambah = (nama, info, list) => {
+      const h = info.length + 1;
+      const rows = [...info, [], KOLOM, ...list.map(c => [parse(c.tgl), c.bab, c.bak, c.feses, c.kulit, c.makan, c.minum ? +c.minum : '', c.obat, c.catatan])];
+      const ws = X.utils.aoa_to_sheet(rows);
+      const gaya = (r, c, s) => { (ws[X.utils.encode_cell({ r, c })] ||= { t: 's', v: '' }).s = s; };
+      for (let c = 0; c < KOLOM.length; c++) {
+        info.forEach((_, r) => gaya(r, c, c ? sel : judul));
+        gaya(h, c, judul);
+        for (let r = h + 1; r < rows.length; r++) gaya(r, c, c ? sel : tgl);
+      }
+      ws['!merges'] = info.map((_, r) => ({ s: { r, c: 1 }, e: { r, c: KOLOM.length - 1 } })); // isi info selebar tabel
+      ws['!cols'] = [18, 10, 14, 22, 18, 14, 10, 22, 40].map(wch => ({ wch }));
+      X.utils.book_append_sheet(wb, ws, namaSheet(nama));
+    };
+    cg.pasien.forEach(p => tambah(namaPasien(p), [['Nama', p.nama], ['Kamar', p.kamar], ['Penanganan khusus', p.info]], semua.filter(c => c.pid === p.id)));
+    // catatan pasien yang sudah dihapus dari daftar tetap ikut, dikelompokkan per nama
+    const sisa = semua.filter(c => !cg.pasien.some(p => p.id === c.pid)), nm = c => c.nama || c.lansia || 'Lainnya';
+    [...new Set(sisa.map(nm))].forEach(n => tambah(n, [['Nama', n], ['Keterangan', 'sudah dihapus dari daftar pasien']], sisa.filter(c => nm(c) === n)));
+    if (!wb.SheetNames.length) return kabar('Belum ada data pasien.');
+    X.writeFile(wb, `Saku Bidan pasien ${iso(new Date())}.xlsx`);
+  } catch (e) {
+    kabar(`Gagal membuat Excel (${e.code || e.message}). Cek internet lalu coba lagi.`);
+  } finally {
+    b.disabled = false; b.textContent = 'Unduh Excel semua pasien';
+  }
+};
+
+// pengingat: posisi, minum, dan obat per pasien; minum untuk diri sendiri terpisah
+const xIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+const pgHtml = (defs, p) => defs.map(([k, judul, ket]) => `<div class="pg" data-pg="${k}">
+    <label class="cek"><input type="checkbox" data-k="on"${p[k].on ? ' checked' : ''}><span>${judul}<small>${ket}</small></span></label>
+    <div class="row">
+      <div><p class="lbl">Tiap</p><select data-k="tiap" aria-label="Interval ${judul}">${TIAP.map(m => `<option value="${m}"${m === +p[k].tiap ? ' selected' : ''}>${m < 60 ? m + ' menit' : num(m / 60) + ' jam'}</option>`).join('')}</select></div>
+      <div><p class="lbl">Mulai</p><input type="time" data-k="mulai" value="${esc(p[k].mulai)}" aria-label="Jam mulai ${judul}"></div>
+      <div><p class="lbl">Sampai</p><input type="time" data-k="selesai" value="${esc(p[k].selesai)}" aria-label="Jam selesai ${judul}"></div>
+    </div></div>`).join('');
+function renderPg() {
+  const p = aktif();
+  $('pgList').innerHTML = !p ? '' : `<h3>Untuk ${esc(namaPasien(p))}</h3>` + pgHtml(PG_PASIEN, p.pengingat)
+    + p.pengingat.obat.map((o, i) => `<div class="pg" data-obat="${i}">
+      <label class="cek"><input type="checkbox" data-k="on"${o.on ? ' checked' : ''}><span>Jadwal obat<small>setiap hari pada jam ini</small></span></label>
+      <div class="row">
+        <div><p class="lbl">Jam</p><input type="time" data-k="jam" value="${esc(o.jam)}" aria-label="Jam obat"></div>
+        <div style="flex:1.4"><p class="lbl">Obat</p><input data-k="ket" maxlength="40" value="${esc(o.ket)}" placeholder="mis. amlodipin 5 mg" aria-label="Nama obat"></div>
+        <button class="icon" type="button" data-hapus="${i}" aria-label="Hapus jadwal obat ini">${xIcon}</button>
+      </div></div>`).join('');
+  $('obatTambah').hidden = !p;
+  $('pgSaya').innerHTML = pgHtml(PG_SAYA, cg.pengingat);
+}
+const ubahPg = sumber => e => {
+  const el = e.target, k = el.dataset.k, box = el.closest('.pg'), src = sumber();
+  if (!k || !box || !src) return;
+  const obj = box.dataset.pg ? src[box.dataset.pg] : src.obat[box.dataset.obat];
+  obj[k] = el.type === 'checkbox' ? el.checked : k === 'tiap' ? +el.value : el.value;
+  saveCg();
+};
+$('pgList').oninput = $('pgList').onchange = ubahPg(() => aktif()?.pengingat);
+$('pgSaya').oninput = $('pgSaya').onchange = ubahPg(() => cg.pengingat);
+$('pgList').onclick = e => {
+  const b = e.target.closest('[data-hapus]');
+  if (!b) return;
+  aktif().pengingat.obat.splice(+b.dataset.hapus, 1); renderPg(); saveCg();
+};
+$('obatTambah').onclick = () => { aktif().pengingat.obat.push({ id: 'obat-' + Date.now().toString(36), on: true, jam: '08:00', ket: '' }); renderPg(); saveCg(); };
+
+// Web Push: izin hanya diminta dari tombol "Aktifkan Pengingat" (syarat iOS)
+const PUSH = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+let swReg, vapid, subNow;
+const b64 = s => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0));
+const subId = async () => [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(subNow.endpoint)))].map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 32);
+async function simpanSub() {
+  if (!subNow || !auth?.currentUser) return;
+  F.setDoc(F.doc(userRef(), 'push', await subId()), { sub: subNow.toJSON(), t: Date.now(), hp: navigator.userAgent.slice(0, 150) }).catch(saveFail);
+}
+function paintPush() {
+  const aktifPush = !!subNow && PUSH && Notification.permission === 'granted';
+  $('pushOn').hidden = aktifPush; $('pushAktif').hidden = !aktifPush;
+  $('pushStatus').textContent = aktifPush ? 'Pengingat aktif di HP ini. Atur jadwalnya di bawah.'
+    : IOS && !STANDALONE ? 'Di iPhone, pasang Saku Bidan ke layar utama dulu lalu buka dari ikonnya. Butuh iOS 16.4 atau lebih baru.'
+    : !PUSH ? 'Browser ini belum mendukung notifikasi.'
+    : 'Tekan Aktifkan Pengingat, lalu pilih Izinkan.';
+}
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').then(() => navigator.serviceWorker.ready)
+    .then(r => { swReg = r; return r.pushManager?.getSubscription(); })
+    .then(s => { subNow = s; paintPush(); simpanSub(); }).catch(() => {});
+}
+if (PUSH) fetch('/api/pengingat?kunci').then(r => r.json()).then(j => { vapid = j.publicKey; }).catch(() => {});
+$('pushOn').onclick = async () => {
+  if (IOS && !STANDALONE) { $('pasang').hidden = false; return window.scrollTo(0, 0); }
+  if (!PUSH) return kabar('Browser ini belum mendukung notifikasi.');
+  if (!swReg || !vapid) return kabar('Pengingat belum siap. Cek internet lalu muat ulang halaman.');
+  try {
+    // izin diminta langsung di dalam ketukan tombol, sebelum menunggu apa pun
+    if (Notification.permission === 'default') await Notification.requestPermission();
+    subNow = await swReg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64(vapid) });
+  } catch (e) {
+    return kabar(Notification.permission === 'denied' ? 'Izin notifikasi ditolak. Nyalakan lagi di Pengaturan HP, bagian Notifikasi, Saku Bidan.' : `Gagal mengaktifkan (${e.message}).`);
+  }
+  simpanSub(); saveCg(); paintPush();
+  kabar('Pengingat aktif. Tekan Kirim tes untuk mencoba.');
+};
+$('pushOff').onclick = async () => {
+  const id = await subId();
+  await subNow.unsubscribe().catch(() => {});
+  F.deleteDoc(F.doc(userRef(), 'push', id)).catch(saveFail);
+  subNow = null; paintPush(); kabar('Pengingat di HP ini dimatikan.');
+};
+$('pushTes').onclick = async () => {
+  try {
+    const r = await fetch('/api/pengingat', { method: 'POST', headers: { Authorization: 'Bearer ' + await auth.currentUser.getIdToken() } });
+    const j = await r.json().catch(() => ({}));
+    kabar(!r.ok ? `Gagal (${j.error || r.status}).` : j.terkirim ? 'Tes dikirim. Notifikasi muncul dalam beberapa detik.' : 'Belum ada HP yang terdaftar. Tekan Matikan lalu Aktifkan lagi.');
+  } catch (e) { kabar('Gagal menghubungi server. Cek internet.'); }
+};
+const pasangPerlu = IOS && !STANDALONE;
+try { $('pasang').hidden = !pasangPerlu || localStorage.getItem('pasangTutup') === '1'; } catch (e) { $('pasang').hidden = !pasangPerlu; }
+$('pasangTutup').onclick = () => { $('pasang').hidden = true; try { localStorage.setItem('pasangTutup', '1'); } catch (e) {} };
+
+// catatan harian: satu dokumen per tanggal + pasien, id "2026-11-23_p-xxxx"
+$('ctTgl').value = iso(new Date());
+// jam BAB/BAK dipilih lewat pemilih jam lalu "Tambah"; disimpan sebagai teks "07.30, 10.15" di input tersembunyi #ctBab/#ctBak
+const JAM = ['Bab', 'Bak'];
+const daftarJam = k => $('ct' + k).value.split(',').map(s => s.trim()).filter(Boolean);
+const renderJam = k => {
+  $('ct' + k + 'List').innerHTML = daftarJam(k).map((j, i) => `<button type="button" data-jam-hapus="${k}" data-i="${i}" aria-label="Hapus jam ${j}">${esc(j)}${xIcon}</button>`).join('');
+};
+const jamSekarang = () => JAM.forEach(k => { $('ct' + k + 'Jam').value = new Date().toTimeString().slice(0, 5); });
+const isiCt = d => { CT.forEach(k => { $('ct' + k).value = d?.[k.toLowerCase()] ?? ''; }); JAM.forEach(renderJam); };
+const ctId = () => $('ctTgl').value + '_' + aktif()?.id;
+// form selalu menampilkan catatan pasien aktif di tanggal terpilih (kosong kalau belum ada)
+const isiCtAktif = () => isiCt(catatan.find(c => c.id === ctId()));
+function renderCt() {
+  $('ctList').innerHTML = !auth?.currentUser ? '' : catatan.map(c => {
+    const bb = [c.bab && 'BAB ' + c.bab, c.bak && 'BAK ' + c.bak].filter(Boolean).join(' · ') || 'BAB/BAK belum diisi';
+    const lain = [c.feses && 'feses ' + c.feses.toLowerCase(), c.kulit && 'kulit ' + c.kulit.toLowerCase(), c.makan && 'makan ' + c.makan.toLowerCase(),
+      c.minum && 'minum ' + c.minum + ' gelas', c.obat && 'obat ' + c.obat, c.catatan].filter(Boolean).join(' · ');
+    return `<div class="h"><div><b>${esc(c.nama || c.lansia || '')}</b><span>${fmtS(parse(c.tgl))}</span></div><strong>${esc(bb)}</strong><p class="note">${esc(lain)}</p>`
+      + `<p><button class="link" style="padding:0" data-ct="${esc(c.id)}">Buka</button><button class="link" data-ct-hapus="${esc(c.id)}">Hapus</button></p></div>`;
+  }).join('') || '<p class="note">Belum ada catatan.</p>';
+}
+on(['ctTgl'], isiCtAktif);
+$('ctForm').onclick = e => {
+  const tambah = e.target.closest('[data-jam]'), hapus = e.target.closest('[data-jam-hapus]');
+  const k = tambah?.dataset.jam || hapus?.dataset.jamHapus;
+  if (!k) return;
+  let list = daftarJam(k);
+  if (hapus) list.splice(+hapus.dataset.i, 1);
+  else {
+    const j = $('ct' + k + 'Jam').value.replace(':', '.');
+    if (!j) return kabar('Pilih jamnya dulu.');
+    if (!list.includes(j)) list = [...list, j].sort();
+  }
+  $('ct' + k).value = list.join(', ');
+  renderJam(k);
+};
+jamSekarang();
+$('ctSimpan').onclick = () => {
+  const p = aktif();
+  if (!p) return kabar('Tambah pasien dulu di menu Pasien.');
+  if (!$('ctTgl').value) return kabar('Isi tanggal dulu.');
+  const d = { tgl: $('ctTgl').value, pid: p.id, nama: namaPasien(p), t: Date.now() };
+  CT.forEach(k => { d[k.toLowerCase()] = $('ct' + k).value.trim(); });
+  F.setDoc(F.doc(userRef(), 'catatan', ctId()), d).catch(saveFail);
+  kabar(`Catatan ${d.nama} tersimpan.`);
+};
+$('ctList').onclick = async e => {
+  const buka = e.target.closest('[data-ct]'), hapus = e.target.closest('[data-ct-hapus]');
+  const c = catatan.find(x => x.id === (buka || hapus)?.dataset[buka ? 'ct' : 'ctHapus']);
+  if (!c) return;
+  if (buka) {
+    if (cg.pasien.some(p => p.id === c.pid)) { $('pasienAktif').value = c.pid; $('pasienAktif').onchange(); }
+    $('ctTgl').value = c.tgl; isiCt(c); return $('cgCatatan').scrollIntoView();
+  }
+  if (await tanya(`Hapus catatan ${c.nama || c.lansia} tanggal ${fmtS(parse(c.tgl))}?`, 'Hapus')) F.deleteDoc(F.doc(userRef(), 'catatan', c.id)).catch(saveFail);
+};
+renderCg();
+if (location.hash === '#caregiver') document.querySelector('[data-tab=caregiver]').click();
+
 // ---- muat Firebase di belakang: kalkulator tetap jalan walau sinyal lambat atau server gagal ----
 Promise.all(['app', 'auth', 'firestore'].map(m => import(FB + 'firebase-' + m + '.js'))).then(([fa, fauth, ffs]) => {
   A = fauth; F = ffs;
@@ -970,24 +1442,32 @@ Promise.all(['app', 'auth', 'firestore'].map(m => import(FB + 'firebase-' + m + 
   auth = A.getAuth(app);
   // cache di HP: tetap bisa menyimpan saat offline di puskesmas, dikirim saat online lagi
   db = F.initializeFirestore(app, { localCache: F.persistentLocalCache({ tabManager: F.persistentMultipleTabManager() }) });
+  if (STANDALONE) A.getRedirectResult(auth).catch(loginFail);
   A.onAuthStateChanged(auth, async u => {
     document.querySelectorAll('.if-in').forEach(x => x.hidden = !u);
     document.querySelectorAll('.if-out').forEach(x => x.hidden = !!u);
     $('skripsi').disabled = !u;
+    document.querySelectorAll('.cgf').forEach(x => x.disabled = !u);
     $('akun').textContent = u ? 'Tersimpan di akun ' + u.email : '';
     unsub(); hist = []; st = ST0(); koleksi = K0();
+    unsubCt(); catatan = []; clearTimeout(cgTm); cg = CG0();
     if (u) {
       unsub = F.onSnapshot(F.query(F.collection(userRef(), 'riwayat'), F.orderBy('t', 'desc'), F.limit(50)),
         s => { hist = s.docs.map(d => d.data()); renderHist(); },
         e => { $('fbStatus').textContent = `Gagal membaca riwayat (${e.code}).`; });
+      unsubCt = F.onSnapshot(F.query(F.collection(userRef(), 'catatan'), F.orderBy('t', 'desc'), F.limit(30)),
+        s => { catatan = s.docs.map(d => ({ id: d.id, ...d.data() })); renderCt(); },
+        e => { $('fbStatus').textContent = `Gagal membaca catatan (${e.code}).`; });
       const snap = await F.getDoc(userRef()).catch(() => null);
       if (auth.currentUser !== u) return; // sudah keluar/ganti akun saat menunggu
       st = Object.assign(ST0(), snap?.data()?.skripsi);
       koleksi = Object.assign(K0(), snap?.data()?.game);
       koleksi.pakai = Object.assign(K0().pakai, koleksi.pakai);
       for (const s in koleksi.pakai) if (!ITEMS[koleksi.pakai[s]]) koleksi.pakai[s] = K0().pakai[s]; // item lama yang sudah dihapus
+      cg = gabungCg(snap?.data()?.caregiver);
+      simpanSub();
     }
-    renderHist(); fillSkripsi(); renderIstana();
+    renderHist(); fillSkripsi(); renderIstana(); renderCg();
   });
 }).catch(() => { $('fbStatus').textContent = 'Tidak terhubung ke server. Kalkulator tetap bisa dipakai, tapi riwayat dan progress belum bisa disimpan.'; });
 
