@@ -449,7 +449,7 @@ footer{padding:var(--space-5) var(--space-4);font:italic 400 14px/20px var(--fon
         <select id="ctKulit"><option value="">Belum diisi</option><option>Utuh</option><option>Kemerahan</option><option>Lecet</option><option>Luka tekan</option><option>Lainnya, lihat catatan</option></select>
         <div class="row" style="margin-top:var(--space-4)">
           <div><label for="ctMakan">Makan</label><select id="ctMakan"><option value="">Belum diisi</option><option>Habis</option><option>Setengah</option><option>Sedikit</option><option>Tidak mau makan</option></select></div>
-          <div><label for="ctMinum">Minum (gelas)</label><input id="ctMinum" type="number" inputmode="decimal" min="0" step="0.5" placeholder="mis. 6"></div>
+          <div><label for="ctMinum">Minum (gelas)</label><input id="ctMinum" inputmode="decimal" maxlength="5" placeholder="mis. 6 atau 1,5"></div>
         </div>
         <label for="ctObat">Obat yang diberikan</label><input id="ctObat" maxlength="80" placeholder="mis. amlodipin 07.00">
         <label for="ctCatatan">Catatan</label><textarea id="ctCatatan" maxlength="500" placeholder="mis. tidur siang 2 jam, mengeluh pusing pagi"></textarea>
@@ -1392,12 +1392,18 @@ const jamSekarang = () => JAM.forEach(k => { $('ct' + k + 'Jam').value = new Dat
 const isiCt = d => { CT.forEach(k => { $('ct' + k).value = d?.[k.toLowerCase()] ?? ''; }); JAM.forEach(renderJam); };
 const ctId = () => $('ctTgl').value + '_' + aktif()?.id;
 // form selalu menampilkan catatan pasien aktif di tanggal terpilih (kosong kalau belum ada)
-const isiCtAktif = () => isiCt(catatan.find(c => c.id === ctId()));
+// daftar hanya memuat 30 catatan terakhir; catatan lebih lama diambil langsung supaya form tidak tampil kosong
+// lalu menimpa catatan lama saat disimpan
+const isiCtAktif = () => {
+  const id = ctId(), x = catatan.find(c => c.id === id);
+  isiCt(x);
+  if (!x && aktif() && auth?.currentUser) F.getDoc(F.doc(userRef(), 'catatan', id)).then(s => { if (s.exists() && ctId() === id) isiCt(s.data()); }).catch(() => {});
+};
 function renderCt() {
   $('ctList').innerHTML = !auth?.currentUser ? '' : catatan.map(c => {
     const bb = [c.bab && 'BAB ' + c.bab, c.bak && 'BAK ' + c.bak].filter(Boolean).join(' · ') || 'BAB/BAK belum diisi';
     const lain = [c.feses && 'feses ' + c.feses.toLowerCase(), c.kulit && 'kulit ' + c.kulit.toLowerCase(), c.makan && 'makan ' + c.makan.toLowerCase(),
-      c.minum && 'minum ' + c.minum + ' gelas', c.obat && 'obat ' + c.obat, c.catatan].filter(Boolean).join(' · ');
+      c.minum && 'minum ' + num(+c.minum) + ' gelas', c.obat && 'obat ' + c.obat, c.catatan].filter(Boolean).join(' · ');
     return `<div class="h"><div><b>${esc(c.nama || c.lansia || '')}</b><span>${fmtS(parse(c.tgl))}</span></div><strong>${esc(bb)}</strong><p class="note">${esc(lain)}</p>`
       + `<p><button class="link" style="padding:0" data-ct="${esc(c.id)}">Buka</button><button class="link" data-ct-hapus="${esc(c.id)}">Hapus</button></p></div>`;
   }).join('') || '<p class="note">Belum ada catatan.</p>';
@@ -1418,12 +1424,22 @@ $('ctForm').onclick = e => {
   renderJam(k);
 };
 jamSekarang();
+// aplikasi di HP sering dibiarkan terbuka berjam-jam: saat dibuka lagi, jam BAB/BAK kembali ke jam sekarang,
+// dan kalau sudah ganti hari, tanggal catatan ikut pindah ke hari ini (supaya tidak tersimpan ke tanggal kemarin)
+let hariCt = iso(new Date());
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) return;
+  jamSekarang();
+  if (iso(new Date()) !== hariCt) { hariCt = iso(new Date()); $('ctTgl').value = hariCt; isiCtAktif(); }
+});
 $('ctSimpan').onclick = () => {
   const p = aktif();
   if (!p) return kabar('Tambah pasien dulu di menu Pasien.');
   if (!$('ctTgl').value) return kabar('Isi tanggal dulu.');
   const d = { tgl: $('ctTgl').value, pid: p.id, nama: namaPasien(p), t: Date.now() };
   CT.forEach(k => { d[k.toLowerCase()] = $('ct' + k).value.trim(); });
+  // keyboard angka iPhone berbahasa Indonesia memakai koma (1,5); disimpan sebagai 1.5
+  if (d.minum) { const m = dec(d.minum); if (!(m >= 0)) return kabar('Isi minum dengan angka, mis. 6 atau 1,5.'); d.minum = String(m); }
   F.setDoc(F.doc(userRef(), 'catatan', ctId()), d).catch(saveFail);
   kabar(`Catatan ${d.nama} tersimpan.`);
 };
@@ -1432,7 +1448,9 @@ $('ctList').onclick = async e => {
   const c = catatan.find(x => x.id === (buka || hapus)?.dataset[buka ? 'ct' : 'ctHapus']);
   if (!c) return;
   if (buka) {
-    if (cg.pasien.some(p => p.id === c.pid)) { $('pasienAktif').value = c.pid; $('pasienAktif').onchange(); }
+    // catatan pasien yang sudah dihapus tidak dibuka: kalau dibuka, form akan tersimpan atas nama pasien lain
+    if (!cg.pasien.some(p => p.id === c.pid)) return kabar('Pasien ini sudah dihapus. Catatannya tetap ada di Excel.');
+    $('pasienAktif').value = c.pid; $('pasienAktif').onchange();
     $('ctTgl').value = c.tgl; isiCt(c); return $('cgCatatan').scrollIntoView();
   }
   if (await tanya(`Hapus catatan ${c.nama || c.lansia} tanggal ${fmtS(parse(c.tgl))}?`, 'Hapus')) F.deleteDoc(F.doc(userRef(), 'catatan', c.id)).catch(saveFail);

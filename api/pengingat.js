@@ -57,12 +57,14 @@ export default async function handler(req, res) {
     });
     let terkirim = 0;
     for (const [uid, subs] of Object.entries(perUser)) {
-      const ref = db.doc(`users/${uid}`), data = (await ref.get()).data() || {};
-      if (!data.caregiver) continue;
-      const due = jatuhTempo(data.caregiver, now, data.cgTerkirim);
-      if (!due.length) continue;
-      for (const p of due) terkirim += await kirim(subs, { title: p.judul, body: p.isi, tag: p.id });
-      await ref.set({ cgTerkirim: Object.fromEntries(due.map(p => [p.id, p.t])) }, { merge: true });
+      try { // data satu user yang rusak (mis. zona waktu tidak dikenal) tidak boleh menghentikan pengingat user lain
+        const ref = db.doc(`users/${uid}`), data = (await ref.get()).data() || {};
+        if (!data.caregiver) continue;
+        const due = jatuhTempo(data.caregiver, now, data.cgTerkirim);
+        if (!due.length) continue;
+        for (const p of due) terkirim += await kirim(subs, { title: p.judul, body: p.isi, tag: p.id });
+        await ref.set({ cgTerkirim: Object.fromEntries(due.map(p => [p.id, p.t])) }, { merge: true });
+      } catch (e) { console.error('pengingat gagal untuk', uid, e); }
     }
     return res.json({ user: Object.keys(perUser).length, terkirim });
   }
