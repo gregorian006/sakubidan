@@ -233,6 +233,11 @@ fieldset:disabled{opacity:.5}
 .pg .row .lbl{margin-top:0}
 .pg .row{gap:var(--space-2)}
 .pg input[type=time]{padding:0 6px}
+.pg select{padding:0 26px 0 10px;background-position:calc(100% - 15px) 50%,calc(100% - 10px) 50%}
+/* iOS Safari: input jam/tanggal bawaan mengabaikan min-height (jadi pendek), tidak mau menyempit di dalam baris,
+   dan teksnya menempel di atas. Tinggi dikunci, boleh menyempit, teks di tengah secara vertikal. Hanya di tab Caregiver. */
+#caregiver :is(input[type=date],input[type=time]){-webkit-appearance:none;appearance:none;height:var(--control-h);min-width:0;line-height:calc(var(--control-h) - 2px);text-align:left}
+#caregiver :is(input[type=date],input[type=time])::-webkit-date-and-time-value{margin:0;line-height:inherit;text-align:left}
 .pg .row .icon{align-self:flex-end;height:var(--control-h)}
 #caregiver.besar{--control-h:60px;--tap-min:56px}
 #caregiver.besar :is(input,select,textarea,.opt,.btn,.cek){font-size:18px}
