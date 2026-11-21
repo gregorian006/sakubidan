@@ -1240,8 +1240,24 @@ const muatXlsx = () => window.XLSX ? Promise.resolve(window.XLSX) : new Promise(
   s.src = XLSX_URL; s.onload = () => ok(window.XLSX); s.onerror = () => gagal(new Error('library Excel tidak termuat'));
   document.head.append(s);
 });
+// iPhone (terutama dari ikon layar utama) tidak mau mengunduh file langsung, jadi file dibuka lewat menu Bagikan
+// (Simpan ke File, WhatsApp, dll.). Menu Bagikan harus dipicu ketukan; kalau izin ketukan sudah habis karena
+// menunggu data, tombol berubah jadi "Simpan file Excel" untuk diketuk sekali lagi.
+let excelSiap = null;
+const labelExcel = () => { $('unduhExcel').textContent = excelSiap ? 'Simpan file Excel' : 'Unduh Excel semua pasien'; };
+async function bagikanExcel() {
+  try {
+    await navigator.share({ files: [excelSiap], title: excelSiap.name });
+    excelSiap = null;
+  } catch (e) {
+    if (e.name === 'AbortError') excelSiap = null; // dibatalkan dari menu Bagikan
+    else kabar('File Excel siap. Tekan "Simpan file Excel" untuk menyimpan.');
+  }
+  labelExcel();
+}
 $('unduhExcel').onclick = async () => {
   const b = $('unduhExcel');
+  if (excelSiap) return bagikanExcel();
   b.disabled = true; b.textContent = 'Menyiapkan Excel...';
   try {
     const [X, s] = await Promise.all([muatXlsx(), F.getDocs(F.collection(userRef(), 'catatan'))]);
@@ -1280,11 +1296,16 @@ $('unduhExcel').onclick = async () => {
     const sisa = semua.filter(c => !cg.pasien.some(p => p.id === c.pid)), nm = c => c.nama || c.lansia || 'Lainnya';
     [...new Set(sisa.map(nm))].forEach(n => tambah(n, [['Nama', n], ['Keterangan', 'sudah dihapus dari daftar pasien']], sisa.filter(c => nm(c) === n)));
     if (!wb.SheetNames.length) return kabar('Belum ada data pasien.');
-    X.writeFile(wb, `Saku Bidan pasien ${iso(new Date())}.xlsx`);
+    const nama = `Saku Bidan pasien ${iso(new Date())}.xlsx`;
+    if ((IOS || STANDALONE) && navigator.canShare) {
+      const f = new File([X.write(wb, { bookType: 'xlsx', type: 'array' })], nama, { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      if (navigator.canShare({ files: [f] })) { excelSiap = f; b.disabled = false; return await bagikanExcel(); }
+    }
+    X.writeFile(wb, nama);
   } catch (e) {
     kabar(`Gagal membuat Excel (${e.code || e.message}). Cek internet lalu coba lagi.`);
   } finally {
-    b.disabled = false; b.textContent = 'Unduh Excel semua pasien';
+    b.disabled = false; labelExcel();
   }
 };
 
