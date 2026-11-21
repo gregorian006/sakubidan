@@ -1113,7 +1113,7 @@ const PG_SAYA = [['minumSaya', 'Minum air untuk Princess', 'jaga diri sendiri ju
 const TIAP = [30, 60, 90, 120, 180, 240];
 const CT = ['Bab', 'Bak', 'Feses', 'Kulit', 'Makan', 'Minum', 'Obat', 'Catatan'];
 const jadwal0 = tiap => ({ on: false, tiap, mulai: '07:00', selesai: '21:00' });
-const PASIEN0 = () => ({ id: 'p-' + Date.now().toString(36), nama: '', kamar: '', info: '', pengingat: { posisi: jadwal0(120), minumLansia: jadwal0(120), obat: [] } });
+const PASIEN0 = () => ({ id: 'p-' + Date.now().toString(36), nama: '', kamar: '', umur: '', info: '', pengingat: { posisi: jadwal0(120), minumLansia: jadwal0(120), obat: [] } });
 const CG0 = () => ({ pengingat: { minumSaya: jadwal0(60) }, pasien: [] });
 const gabungCg = d => {
   const c = CG0();
@@ -1154,7 +1154,7 @@ function renderAktif() {
   $('aktifBox').hidden = !ada || diPasien;
   $('belumPasien').hidden = ada || diPasien;
   $('pasienAktif').innerHTML = cg.pasien.map(x => `<option value="${esc(x.id)}"${x === p ? ' selected' : ''}>${esc(namaPasien(x))}</option>`).join('');
-  $('aktifInfo').textContent = p?.info ? 'Penanganan: ' + p.info : '';
+  $('aktifInfo').textContent = [p?.umur && p.umur + ' tahun', p?.info && 'Penanganan: ' + p.info].filter(Boolean).join(' · ');
 }
 const pilihPasien = id => {
   aktifId = id;
@@ -1180,7 +1180,7 @@ function renderPasien() {
     if (cg.pasien.length && !cocok.length) return $('pasienList').innerHTML = '<p class="note" style="margin-top:0">Tidak ada pasien yang cocok.</p>';
     $('pasienList').innerHTML = cocok.map(x => `<button class="akun" type="button" data-buka="${esc(x.id)}">
         <span class="ava">${esc(inisial(x.nama))}</span>
-        <span class="k"><b>${esc(x.nama || 'Tanpa nama')}</b><small>${esc([x.kamar && 'Kamar ' + x.kamar, x.info].filter(Boolean).join(' · ') || 'Belum ada keterangan')}</small></span>
+        <span class="k"><b>${esc(x.nama || 'Tanpa nama')}</b><small>${esc([x.kamar && 'Kamar ' + x.kamar, x.umur && x.umur + ' th', x.info].filter(Boolean).join(' · ') || 'Belum ada keterangan')}</small></span>
         ${x === aktif() ? '<span class="tag">Dirawat</span>' : ''}<span class="chev">${chev}</span>
       </button>`).join('') || '<p class="note" style="margin-top:0">Belum ada pasien.</p>';
     return;
@@ -1188,9 +1188,10 @@ function renderPasien() {
   const dirawat = p === aktif();
   $('pasienList').innerHTML = `<div class="akun-top"><span class="ava xl" id="pAva">${esc(inisial(p.nama))}</span>
       <span class="k"><b id="pNama">${esc(p.nama || 'Pasien baru')}</b><small>${dirawat ? 'Sedang dirawat' : 'Profil pasien'}</small></span></div>
-    <div class="row">
-      <div style="flex:2"><label for="pn">Nama</label><input id="pn" data-k="nama" maxlength="40" value="${esc(p.nama)}" placeholder="mis. Ny. Siti Aminah"></div>
+    <label for="pn">Nama</label><input id="pn" data-k="nama" maxlength="40" value="${esc(p.nama)}" placeholder="mis. Ny. Siti Aminah">
+    <div class="row" style="margin-top:var(--space-4)">
       <div><label for="pk">Kamar</label><input id="pk" data-k="kamar" maxlength="10" value="${esc(p.kamar)}" placeholder="mis. K-03"></div>
+      <div><label for="pu">Umur (tahun)</label><input id="pu" data-k="umur" inputmode="numeric" maxlength="3" value="${esc(p.umur)}" placeholder="mis. 78"></div>
     </div>
     <label for="pi">Penanganan khusus</label>
     <textarea id="pi" data-k="info" maxlength="300" placeholder="mis. tirah baring, diabetes, diet rendah garam, alergi">${esc(p.info)}</textarea>
@@ -1203,6 +1204,7 @@ on(['cariPasien'], renderPasien);
 $('pasienList').oninput = e => {
   const k = e.target.dataset.k, p = cg.pasien.find(x => x.id === bukaId);
   if (!k || !p) return;
+  if (k === 'umur') e.target.value = e.target.value.replace(/\D/g, ''); // umur hanya angka
   p[k] = e.target.value;
   if (k === 'nama') { $('pNama').textContent = p.nama || 'Pasien baru'; $('pAva').textContent = inisial(p.nama); }
   renderAktif(); saveCg();
@@ -1210,7 +1212,7 @@ $('pasienList').oninput = e => {
 const tutupProfil = () => {
   const p = cg.pasien.find(x => x.id === bukaId);
   // pasien baru yang dibiarkan kosong tidak disimpan
-  if (p && !p.nama.trim() && !p.kamar.trim() && !p.info.trim()) { cg.pasien.splice(cg.pasien.indexOf(p), 1); saveCg(); }
+  if (p && !p.nama.trim() && !p.kamar.trim() && !p.umur && !p.info.trim()) { cg.pasien.splice(cg.pasien.indexOf(p), 1); saveCg(); }
   bukaId = null; renderCg();
 };
 $('pasienList').onclick = async e => {
@@ -1291,7 +1293,7 @@ $('unduhExcel').onclick = async () => {
       ws['!cols'] = [18, 10, 14, 22, 18, 14, 10, 22, 40].map(wch => ({ wch }));
       X.utils.book_append_sheet(wb, ws, namaSheet(nama));
     };
-    cg.pasien.forEach(p => tambah(namaPasien(p), [['Nama', p.nama], ['Kamar', p.kamar], ['Penanganan khusus', p.info]], semua.filter(c => c.pid === p.id)));
+    cg.pasien.forEach(p => tambah(namaPasien(p), [['Nama', p.nama], ['Kamar', p.kamar], ['Umur', p.umur ? p.umur + ' tahun' : ''], ['Penanganan khusus', p.info]], semua.filter(c => c.pid === p.id)));
     // catatan pasien yang sudah dihapus dari daftar tetap ikut, dikelompokkan per nama
     const sisa = semua.filter(c => !cg.pasien.some(p => p.id === c.pid)), nm = c => c.nama || c.lansia || 'Lainnya';
     [...new Set(sisa.map(nm))].forEach(n => tambah(n, [['Nama', n], ['Keterangan', 'sudah dihapus dari daftar pasien']], sisa.filter(c => nm(c) === n)));
